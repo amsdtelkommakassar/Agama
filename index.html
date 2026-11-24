@@ -1,4 +1,5 @@
 <!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Petualangan PAI: Negeri Padang Pasir (Voxel)</title><meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Lilita+One&display=swap" rel="stylesheet">
 <style>
 :root{--pn:#fffaf0;--tx:#3b2a14;--ac:#c77d1a;--ac2:#2e7d32;--bg:#f2d9a6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media(prefers-color-scheme:dark){:root:not([data-theme=light]){--pn:#3a2d1a;--tx:#f6e7c8;--ac:#e9a23b;--bg:#2a2013}}
@@ -58,16 +59,84 @@ mark{background:rgba(46,125,50,.22);color:inherit;border-radius:5px;padding:0 4p
 .res{border-radius:4px 12px 12px 4px;padding:10px 12px;margin:8px 0;background:rgba(128,128,128,.13)}
 .res.ok{background:rgba(46,125,50,.18);border-left:4px solid var(--ac2)}
 .res.no{background:rgba(211,47,47,.16);border-left:4px solid #d32f2f}
+/* ===== TAMPILAN MENU ALA GAME + ADEGAN PANDUAN ===== */
+.box{border:3px solid var(--ac);box-shadow:inset 0 0 0 2px #fff5,0 8px 34px #000a}
+.b{font-weight:600;box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.b.m{background:linear-gradient(#e7ab45,#bd7414);border-color:#8a5208;box-shadow:0 4px 0 #6b3d05}
+.p{border:2px solid rgba(199,125,26,.55)}
+#start{position:fixed;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box;background:none;font-family:'Baloo 2','Trebuchet MS','Segoe UI',Arial,sans-serif;color:#fff4d6}
+#start .tv{position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 45%,#0000 38%,#150a2e99 100%),linear-gradient(#24104acc,#24104a00 38%,#0000 58%,#2b1505b3)}
+#start .tw{position:relative;display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;max-width:440px;max-height:100%;overflow:auto;padding:4px;scrollbar-width:none;touch-action:pan-y}
+#start .tw::-webkit-scrollbar{display:none}
+.lg{text-align:center;animation:drop .9s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes drop{from{transform:translateY(-40px) scale(.92);opacity:0}to{transform:none;opacity:1}}
+.lg svg{display:block;margin:0 auto 2px;filter:drop-shadow(0 3px 6px #000a)}
+.lg h1{margin:0;font:400 clamp(34px,10vw,68px)/.95 'Lilita One','Baloo 2',Impact,sans-serif;letter-spacing:1px;background:linear-gradient(#fff3b0,#ffd04a 45%,#f08a1c);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 3px 0 #7a3a04) drop-shadow(0 6px 0 #4a2204) drop-shadow(0 10px 14px #000b)}
+.rb{display:inline-block;margin:12px 0 6px;padding:4px 26px;font:400 clamp(16px,4.6vw,24px)/1.2 'Lilita One','Baloo 2',sans-serif;color:#fff;background:linear-gradient(#25bfac,#0e7a6d);border:2px solid #ffd36b;border-radius:8px;box-shadow:0 4px 0 #064a41,0 8px 14px #0008;text-shadow:0 2px 0 #064a41}
+.lg p{margin:6px auto 0;max-width:34ch;font-size:15px;line-height:1.35;color:#fff4d6;text-shadow:0 2px 6px #000c}
+.mp{width:100%;box-sizing:border-box;padding:16px;border-radius:20px;background:linear-gradient(#4a2d12f2,#2a170af2);border:3px solid #f1b94d;box-shadow:inset 0 0 0 2px #8a5a1f,inset 0 0 30px #0007,0 14px 40px #000a;display:flex;flex-direction:column;gap:9px}
+.mp label{font-weight:700;font-size:14px;color:#ffd98a}
+#start input{width:100%;box-sizing:border-box;margin:0;padding:11px 14px;font:600 17px 'Baloo 2','Segoe UI',sans-serif;border-radius:12px;border:2px solid #8a5a1f;background:#1d1006;color:#fff4d6;outline:none;user-select:text}
+#start input::placeholder{color:#b99a6a}
+#start input:focus-visible{border-color:#ffd36b;box-shadow:0 0 0 3px #ffd36b55}
+#err{color:#ff9a8a;font-size:14px;margin-top:-4px}#err:empty{display:none}
+.gb{font:800 18px/1.15 'Baloo 2','Segoe UI',sans-serif;border:0;border-radius:14px;padding:12px 14px;cursor:pointer;transition:transform .08s,box-shadow .08s,filter .15s;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;margin:0}
+.gb small{font-weight:600;font-size:12.5px;opacity:.85}
+.gb:hover{filter:brightness(1.08)}
+.gb:focus-visible,.seg button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+.gold{background:linear-gradient(#ffe07a,#f3a622);color:#4a2504;box-shadow:0 5px 0 #a35a12,0 8px 16px #0007;font-size:21px;padding:14px}
+.gold:active{transform:translateY(4px);box-shadow:0 1px 0 #a35a12}
+.teal{background:linear-gradient(#45d3bf,#18998a);color:#04332d;box-shadow:0 5px 0 #0b5f54,0 8px 16px #0007}
+.teal:active{transform:translateY(4px);box-shadow:0 1px 0 #0b5f54}
+.dark{background:#ffffff1c;color:#ffe9b8;border:2px solid #f1b94d88;box-shadow:0 4px 0 #0006;font-size:15px;padding:10px 6px}
+.dark:active{transform:translateY(3px);box-shadow:0 1px 0 #0006}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg{display:flex;align-items:center;gap:4px;background:#0005;border-radius:12px;padding:4px}
+.seg span{padding:0 8px;font-size:13px;color:#ffd98a;font-weight:700}
+.seg button{flex:1;font:700 13.5px 'Baloo 2','Segoe UI',sans-serif;border:0;border-radius:9px;padding:7px 4px;background:transparent;color:#ffe9b8;cursor:pointer}
+.seg button.on{background:#f3a622;color:#4a2504}
+.bd{display:flex;justify-content:center;gap:8px}
+.bd i{font-style:normal;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;background:#0006;border:2px solid #8a5a1f;filter:grayscale(1) brightness(.55)}
+.bd i.on{filter:none;background:#ffd36b33;border-color:#ffd36b}
+@media(max-height:520px) and (orientation:landscape){#start .tw{flex-direction:row;max-width:900px;gap:22px}.lg{flex:1}.lg p,.lg svg{display:none}.mp{flex:0 0 min(46vw,400px);padding:12px;gap:6px}.gold{padding:10px}.gb{font-size:16px}.dark{padding:8px 4px}}
+/* adegan panduan */
+#cn{position:fixed;inset:0;z-index:9;display:none;pointer-events:none;font-family:'Baloo 2','Trebuchet MS','Segoe UI',Arial,sans-serif;color:#fff4d6}
+#cf{position:fixed;inset:0;background:#000;opacity:0;transition:opacity .45s;z-index:10;pointer-events:none}
+#cn .bar{position:absolute;left:0;right:0;height:max(9vh,34px);background:#000}
+#cn .bt{top:0}#cn .bb{bottom:0}
+#cd{position:absolute;left:0;right:0;top:0;height:max(9vh,34px);display:flex;align-items:center;justify-content:center;gap:5px}
+#cd i{width:20px;height:5px;border-radius:3px;background:#fff4;transition:background .3s}
+#cd i.on{background:#ffd36b}#cd i.ok{background:#fffa}
+#cc{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(max(9vh,34px) + 12px);width:min(94vw,640px);box-sizing:border-box;padding:12px 16px 14px;border-radius:16px;background:linear-gradient(#3b2410ee,#241408ee);border:2px solid #f1b94d;box-shadow:0 10px 30px #000a}
+#cc h3{margin:0 0 2px;font:400 clamp(18px,4.6vw,26px)/1.15 'Lilita One','Baloo 2',sans-serif;color:#ffd36b}
+#cL{font-size:13px;color:#8ee6d8;font-weight:700;margin-bottom:5px}
+#cS{margin:0;font-size:clamp(14px,3.6vw,16.5px);line-height:1.45}
+#cX{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+#cX:empty{display:none}
+#cX span{background:#ffffff1c;border:1px solid #f1b94d77;border-radius:10px;padding:2px 9px;font-size:13px;font-weight:600}
+#cp{position:absolute;transform:translate(-50%,-100%);display:none;white-space:nowrap;margin-top:-8px;padding:3px 12px;border-radius:12px;background:#ffd36b;color:#4a2504;font-weight:800;font-size:14px;box-shadow:0 3px 10px #0008}
+#cp:after{content:"";position:absolute;left:50%;top:100%;margin-left:-6px;border:6px solid transparent;border-top-color:#ffd36b}
+#cn .ct{position:absolute;right:calc(8px + env(safe-area-inset-right,0px));top:calc(8px + env(safe-area-inset-top,0px));display:flex;gap:6px}
+#cn .ct .ib{width:40px;height:40px;font-size:17px;background:#241408;color:#ffe9b8;border:2px solid #f1b94d}
+#cn .ct .sk{width:auto;border-radius:20px;padding:0 14px;font:700 14px 'Baloo 2','Segoe UI',sans-serif}
 </style></head><body>
 <canvas id="c"></canvas><div id="joy"><i></i></div>
 <div id="hud"><div id="tl"><div class="p" id="who"></div><div class="p" id="cmp"></div><div class="p" id="jbp" style="display:none"></div></div>
 <div id="tr"><button class="ib" id="bCam" title="Kamera (C)">📷</button><button class="ib" id="bHome" title="Rumah & Pekerjaan (H)">🏠</button><button class="ib" id="bMis" title="Misi (M)">📋</button><button class="ib" id="bMus" title="Musik (N)">🎵</button><button class="ib" id="bMenu" title="Menu (Esc)">☰</button></div>
 <div class="p" id="tt"></div><div class="p" id="pr"></div><button class="ib" id="bE">E</button></div>
-<div class="ov" id="start"><div class="box"><h2>🕌 Petualangan PAI: Negeri Padang Pasir</h2><div class="t">Jelajahi negeri padang pasir, temui para warga, selesaikan 6 misi PAI (BAB 1–5), dan kumpulkan semua lencana!</div>
-<input id="nama" maxlength="30" placeholder="Tulis namamu" autocomplete="off"><div id="err" style="color:#d32f2f;min-height:18px"></div>
-<div class="t" style="margin:4px 0">Pilih sudut pandang:</div><div class="row"><button class="b on" id="c1">👁️ First Person</button><button class="b" id="c2">🧍 Third Person</button></div>
-<button class="b m" id="go">▶ Mulai Petualangan</button><button class="b m" id="cont" style="display:none">↩ Lanjutkan Progres</button><button class="b" id="how">🎮 Cara Bermain</button></div></div>
+<div id="start"><div class="tv"></div><div class="tw">
+<header class="lg"><svg viewBox="0 0 64 64" width="54" height="54" aria-hidden="true"><path d="M42 8a24 24 0 1 0 0 48 19 19 0 0 1 0-48z" fill="#ffd36b" stroke="#7a3a04" stroke-width="2.5"/><path d="M50 18l2.6 5.4 5.9.8-4.3 4.1 1 5.9-5.2-2.8-5.2 2.8 1-5.9-4.3-4.1 5.9-.8z" fill="#fff3b0" stroke="#7a3a04" stroke-width="2"/></svg>
+<h1>PETUALANGAN PAI</h1><div class="rb">Negeri Padang Pasir</div><p>Temui warga, pelajari materi PAI BAB 1–5, dan kumpulkan 6 lencana.</p></header>
+<main class="mp"><label for="nama">Nama petualang</label><input id="nama" maxlength="30" placeholder="Tulis namamu" autocomplete="off"><div id="err"></div>
+<button class="gb gold" id="go">▶ Mulai Petualangan</button>
+<button class="gb teal" id="cont" style="display:none"><span>↩ Lanjutkan Progres</span><small id="cs"></small></button>
+<div class="g2"><button class="gb dark" id="tour">🎬 Tonton Panduan</button><button class="gb dark" id="how">🎮 Cara Bermain</button></div>
+<div class="seg"><span>Kamera</span><button class="on" id="c1">👁️ First Person</button><button id="c2">🧍 Third Person</button></div>
+<div class="bd" id="bds" title="Lencana"></div></main></div></div>
 <div class="ov" id="dlg"><div class="box"><h2 id="dh"></h2><div class="t" id="dt"></div><div id="db"></div></div></div>
+<div id="cf"></div><div id="cn"><div class="bar bt"></div><div class="bar bb"></div><div id="cd"></div><div id="cp"></div>
+<div class="ct"><button class="ib" id="cV" title="Suara narasi">🔊</button><button class="ib" id="cPrev" title="Sebelumnya">⏮</button><button class="ib" id="cP" title="Jeda">⏸</button><button class="ib" id="cNext" title="Berikutnya">⏭</button><button class="ib sk" id="cSkip">Lewati ✕</button></div>
+<div id="cc"><h3 id="cT"></h3><div id="cL"></div><p id="cS"></p><div id="cX"></div></div></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 "use strict";
@@ -614,7 +683,7 @@ const done=()=>S.ms.every(s=>s==3);
 function hud(){$("who").textContent="👤 "+S.name+"  •  ⭐ "+S.pts+"  •  ✅ "+S.ms.filter(s=>s==3).length+"/"+MS.length+"  •  🪙 "+(S.eco?Math.floor(S.eco.coins):0)}
 function misList(){say("📋 Daftar Misi",MS.map((m,i)=>{const s=S.ms[i],ind=s==3?"SELESAI ✅":s==1?"Cari benda "+S.it[i]+"/"+m.items.length+" 🔍":s==2?"Soal "+S.qi[i]+"/"+m.q.length+" 📝":"Belum dimulai ⬜";return (i+1)+". "+m.t+" ("+m.b+")\n    Lokasi: "+N[m.who].n+" • "+ind}).join("\n")+"\n\nPoin: "+S.pts+" / "+MAXP+(S.ms.some(s=>s==3)?"\nLencana: "+MS.filter((m,i)=>S.ms[i]==3).map(m=>m.badge).join(" "):""),[{t:"Tutup"}])}
 function howTo(){say("🎮 Cara Bermain","• Gerak: W A S D / panah (Shift = lari) atau joystick kiri layar.\n• Lihat sekeliling: geser mouse/jari.\n• Bicara & ambil: tombol E (atau tombol E di layar).\n• Ganti kamera: tombol C atau 📷.\n• Daftar misi: tombol M atau 📋.\n• Rumah & pekerjaan: tombol H atau 🏠. Cari tokoh bertanda ◆ oranye (pemberi kerja, agen rumah, toko). Kumpulkan koin, beli rumah di Perumahan Al-Barakah (tenggara), lalu tingkatkan sampai Level 11. Koin emas tersembunyi juga ada di seluruh dunia.\n• Majelis Ilmu (dekat masjid): dengarkan ceramah Ustaz Fauzan, lalu tanya jawab materi. Pertanyaan baru memberi +2 poin.\n• Temui 6 tokoh bertanda ◆ kuning, pelajari materi, lalu jawab soal. Jawaban salah ada penjelasan dan boleh mencoba lagi.\n• Permainan tamat setelah SEMUA misi selesai dengan benar!",[{t:"Mengerti"}])}
-function menu(){say("☰ Menu",`Poin ${S.pts} • Misi selesai ${S.ms.filter(s=>s==3).length}/${MS.length}`,[{t:"▶ Lanjutkan",fn:hide},{t:"📋 Daftar Misi",fn:misList},{t:"🏠 Rumah & Pekerjaan",fn:ecoMenu},{t:"🎵 Musik: "+MUS.label(),fn:MUS.panel},{t:"🔔 Efek suara: "+SFX.label(),fn:()=>{SFX.toggle();menu()}},{t:"🎮 Cara Bermain",fn:howTo},{t:"🔄 Ulangi dari Awal",fn:()=>say("Ulangi dari awal?","Semua progres akan dihapus.",[{t:"Ya, hapus progres",fn:()=>{const n=S.name,c=S.cam;S={name:n,ms:MS.map(_=>0),qi:MS.map(_=>0),it:MS.map(_=>0),pts:0,cam:c,x:0,z:12,tr:0,tk:{},qa:{},eco:null};P.x=0;P.z=12;ecoReset();save();hud();hide()}},{t:"Batal",fn:hide}])}])}
+function menu(){say("☰ Menu",`Poin ${S.pts} • Misi selesai ${S.ms.filter(s=>s==3).length}/${MS.length}`,[{t:"▶ Lanjutkan",fn:hide},{t:"📋 Daftar Misi",fn:misList},{t:"🏠 Rumah & Pekerjaan",fn:ecoMenu},{t:"🎵 Musik: "+MUS.label(),fn:MUS.panel},{t:"🔔 Efek suara: "+SFX.label(),fn:()=>{SFX.toggle();menu()}},{t:"🎮 Cara Bermain",fn:howTo},{t:"🎬 Tonton Panduan",fn:()=>{hide();CINE.play()}},{t:"🔄 Ulangi dari Awal",fn:()=>say("Ulangi dari awal?","Semua progres akan dihapus.",[{t:"Ya, hapus progres",fn:()=>{const n=S.name,c=S.cam;S={name:n,ms:MS.map(_=>0),qi:MS.map(_=>0),it:MS.map(_=>0),pts:0,cam:c,x:0,z:12,tr:0,tk:{},qa:{},eco:null};P.x=0;P.z=12;ecoReset();save();hud();hide()}},{t:"Batal",fn:hide}])}])}
 /* ===== DIALOG & MISI ===== */
 
 const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"),KWR=/(Al-Wahhab|Al-Baqa'|Ahlul Hadar|Ahlul Badui|Wujud|Qidam|Baqa'|Wahdaniyah|Iqra'|Fana|Adam|qada|balig)/g,kw=t=>esc(t).replace(KWR,"<mark>$1</mark>");
@@ -918,7 +987,7 @@ function npcGo(o,x,z,back){o.tx=x;o.tz=z;o.back=back;o.st="walk"}
 function npcBehave(o,dt,d,dx,dz){
  const g=o.g;
  if(o.st==null){o.st=o.sit?"sit":"work";o.tm=rnd(1,8);o.R=NPR(o)}
- const k=Math.min(1,dt*10),hold=UI||d<5,f=(a,v)=>{a.rotation.x+=(v-a.rotation.x)*k},sn=Math.sin(tt*5+o.ph),by=o.by||0,st=o.st;
+ const k=Math.min(1,dt*10),hold=(UI&&started&&!CINEON)||d<5,f=(a,v)=>{a.rotation.x+=(v-a.rotation.x)*k},sn=Math.sin(tt*5+o.ph),by=o.by||0,st=o.st;
  let aL=0,aR=0,lL=0,lR=0,tr=0,y=Math.sin(tt*2+o.ph)*.012;
  const turn=a=>{let e=a-g.rotation.y;e=Math.atan2(Math.sin(e),Math.cos(e));g.rotation.y+=e*Math.min(1,dt*8)};
  if(st=="walk"){
@@ -982,15 +1051,75 @@ $("bE").style.display=coarse&&near&&!UI?"block":"none";
 let tg=null,tn="";const jt=jobTarget();if(jt){tg=jt.p;tn=jt.n}else if(!done()){const mi=S.ms.findIndex(s=>s!=3);if(S.ms[mi]==1){const t=IT.find(t=>t.m==mi&&!S.tk[t.m+"_"+t.k]);if(t){tg=[t.g.position.x,t.g.position.z];tn=t.n}}if(!tg){const o=N[MS[mi].who];tg=[o.g.position.x,o.g.position.z];tn=o.n}}
 if(tg){const dx=tg[0]-P.x,dz=tg[1]-P.z,fx=-Math.sin(yaw),fz=-Math.cos(yaw),dot=fx*dx+fz*dz,rt=Math.cos(yaw)*dx-Math.sin(yaw)*dz,a=Math.atan2(rt,dot),ix=((Math.round(a/(Math.PI/4))%8)+8)%8;$("cmp").textContent="🧭 "+tn+" • "+Math.round(Math.hypot(dx,dz))+" m "+["⬆","↗","➡","↘","⬇","↙","⬅","↖"][ix]}else $("cmp").textContent="🏜️ Semua misi selesai! Jelajahi bebas";
 }
-function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.05);if(started)step(dt);R.render(scene,cam)}loop();
+/* ===== ADEGAN PANDUAN: tur sinematik lokasi tokoh, penjual, misi & petunjuk ===== */
+let CINEON=0;
+function ambient(dt,fx,fz){tt+=dt;TK.forEach(f=>f(dt,tt));animTick(dt);
+N.forEach(o=>{const g=o.g,dx=fx-g.position.x,dz=fz-g.position.z,d=Math.hypot(dx,dz);g.visible=d<120;if(!g.visible)return;npcBehave(o,dt,d,dx,dz);
+if(o.mk){const s=o.m>=0?S.ms[o.m]:0;o.mk.rotation.y+=dt*2;o.mk.position.y=3.1+Math.sin(tt*3+o.ph)*.12;o.mk.material.color.setHex(o.eco?0xff7043:o.cr?0xab47bc:s==3?0x43a047:s>0?0x29b6f6:0xffc107)}})}
+const CINE=(()=>{
+const elC=$("cn"),elF=$("cf"),elP=$("cp"),v3=new T.Vector3(),
+bc=new T.Mesh(new T.CylinderGeometry(.9,.9,18,14,1,true),new T.MeshBasicMaterial({color:0xffd54f,transparent:true,opacity:.3,depthWrite:false,side:T.DoubleSide}));
+bc.visible=false;scene.add(bc);
+let on=0,SH=[],i=0,t=0,pz=0,fd=0,pend=-1,cb=null,sp=0,tok=0,nar=true,oa=.4;
+try{nar=localStorage.getItem("pai_nar")!="0"}catch(e){}
+const dr=(x,z)=>{const dx=x,dz=z-12,m=Math.hypot(dx,dz);if(m<12)return"dekat titik awal";
+const ns=Math.abs(dz)>Math.abs(dx)*.42?(dz<0?"utara":"selatan"):"",ew=Math.abs(dx)>Math.abs(dz)*.42?(dx<0?"barat":"timur"):"",
+d=ns&&ew?(ns=="utara"?(ew=="barat"?"barat laut":"timur laut"):(ew=="barat"?"barat daya":"tenggara")):(ns||ew);
+return d+", "+Math.round(m)+" m dari titik awal"};
+const plain=s=>s.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu,"").replace(/\s+/g," ").trim();
+const nf=k=>N.find(o=>o.n.indexOf(k)==0);
+function build(){const nm=(S&&S.name)||"petualang",L=[];
+const add=o=>{o.say=o.say.replace(/\s+/g," ");L.push(Object.assign({r0:15,r1:9,h0:7,h1:4,a0:.6,da:.55,ly:2.2,dur:Math.max(6.5,o.say.length*.058)},o))};
+const A=(k,o)=>{const n=nf(k);if(n){o.npc=n;o.loc=o.loc.replace("@",dr(n.x,n.z));add(o)}};
+add({at:[8,6],t:"Selamat datang di Negeri Padang Pasir",loc:"🏜️ Titik awal petualanganmu",say:"Halo, "+nm+"! Kamu tiba di negeri padang pasir pada masa lalu. Di sini tinggal 6 tokoh yang menyimpan ilmu PAI BAB 1 sampai 5. Temui mereka, pelajari materinya, selesaikan tantangannya, dan kumpulkan semua lencana.",r0:62,r1:50,h0:36,h1:27,a0:.2,da:.9,ly:0,ex:MS.map(m=>"<span>"+esc(Array.from(m.badge)[0])+" "+esc(m.t)+"</span>").join("")});
+add({at:[0,12],t:"Cara menyelesaikan misi",loc:"🧭 Ikuti kompas di kiri atas layar",say:"Setiap misi punya beberapa tahap. Dengarkan materi dari tokoh yang bertanda berlian. Kerjakan tugas mencari benda bila ada. Lalu jawab kuis sampai benar untuk mendapat lencana dan bonus poin.",r0:16,r1:10,h0:6,h1:4,ly:2,ex:'<span>📖 Materi</span><span>🔍 Cari benda</span><span>📝 Kuis</span><span>🏅 Lencana +20 poin</span><span><b style="color:#ffc107">◆</b> misi baru</span><span><b style="color:#29b6f6">◆</b> sedang berjalan</span><span><b style="color:#43a047">◆</b> selesai</span><span><b style="color:#ff7043">◆</b> kerja &amp; toko</span><span><b style="color:#ab47bc">◆</b> majelis ilmu</span>'});
+const PN={0:"Gua Hira • ",2:"Pasar • ",4:"Pasar • "};
+MS.forEach((m,k)=>{const o=N[m.who];add({npc:o,t:"Misi "+(k+1)+": "+m.t,loc:"📍 "+o.n+" • "+(PN[k]||"")+dr(o.x,o.z),say:"Temui "+o.n+". Materinya: "+m.b+". "+(m.items.length?"Tugasmu: "+m.task:"Setelah belajar, langsung jawab "+m.q.length+" soal kuis.")+" Hadiahnya "+m.badge+".",ex:"<span>📖 "+esc(m.b)+"</span>"+(m.items.length?"<span>🔍 "+m.items.length+" benda</span>":"")+"<span>📝 "+m.q.length+" soal</span><span>"+esc(m.badge)+"</span>"})});
+A("Ustaz Fauzan",{t:"Majelis Ilmu",loc:"🎙️ Ustaz Fauzan • dekat masjid • @",say:"Dekat masjid ada Majelis Ilmu. Ustaz Fauzan berceramah dan menjawab pertanyaanmu tentang semua materi. Setiap pertanyaan baru memberi tambahan 2 poin.",ex:"<span>🎙️ Ceramah</span><span>❓ Tanya jawab</span><span>⭐ +2 poin per pertanyaan baru</span>"});
+add({at:[32,21],t:"Para penjual di Pasar",loc:"🧺 Pasar • "+dr(32,21),pn:"Pasar",say:"Di Pasar ada banyak penjual. Pak Wahab pedagang, Pak Zaid penjual kurma, dan Bu Salma pedagang kain. Pak Wahab dan Pak Zaid juga pemberi misi. Pedagang Sibuk Zubair butuh bantuan mengantar barang dan akan memberimu koin.",r0:26,r1:17,h0:12,h1:8,ly:1.5,ex:"<span>🧺 Pak Wahab</span><span>🌴 Pak Zaid</span><span>🧵 Bu Salma</span><span>🪙 Zubair: antar barang</span>"});
+A("Penjaga Oasis",{t:"Oasis",loc:"💧 Penjaga Oasis • @",say:"Oasis adalah sumber air negeri ini. Penjaga Oasis menjelaskan nikmat Allah, Al-Wahhab. Kurma dan air segar untuk misi puasa ada di sekitar sini, dan Pak Rahim memberi pekerjaan mengantar air.",ex:"<span>🌴 Kurma</span><span>💧 Air segar</span><span>🪙 Pak Rahim: antar air</span>"});
+A("Juragan Ubaid",{t:"Pekerjaan sampingan",loc:"🐪 Juragan Ubaid • @",say:"Selain misi PAI, ada pekerjaan sampingan untuk mencari koin. Temui Juragan Ubaid, Gembala Sulaiman, Peternak Qasim, Pedagang Sibuk Zubair, dan Pak Rahim yang bertanda berlian oranye.",r0:24,r1:15,h0:11,h1:7,ex:"<span>🐪 Giring unta</span><span>🐑 Kumpulkan domba</span><span>🌾 Beri makan ternak</span><span>🧺 Antar barang</span><span>💧 Antar air</span>"});
+add({at:[69,90],t:"Toko & Agen Rumah",loc:"🏠 Perumahan Al-Barakah • "+dr(69,90),pn:"Perumahan Al-Barakah",say:"Di Perumahan Al-Barakah, Pak Makelar Idris menjual rumah dan Pak Tijarah menjual perabot, kandang, serta ternak. Kumpulkan koin dari pekerjaan sampingan, lalu bangun dan tingkatkan rumah impianmu.",r0:34,r1:22,h0:16,h1:10,ly:1.5,ex:"<span>🏠 Pak Makelar Idris: rumah</span><span>🛋️ Pak Tijarah: perabot &amp; ternak</span>"});
+add({at:[0,12],t:"Kontrol permainan",loc:"🎮 Siap berpetualang!",say:"Gunakan W A S D untuk berjalan dan geser layar untuk melihat sekitar. Tekan E untuk bicara atau mengambil benda. Ikuti kompas di kiri atas menuju tokoh berikutnya. Selamat berpetualang!",r0:13,r1:8,h0:5,h1:3.5,a0:2.4,da:-.8,ly:1.8,ex:"<span>W A S D / panah: jalan</span><span>Shift: lari</span><span>Geser: lihat</span><span>E: bicara</span><span>C: kamera</span><span>M: misi</span><span>H: rumah &amp; kerja</span><span>Esc: menu</span>"});
+return L}
+function speak(x){sp=0;const id=++tok;try{const ss=window.speechSynthesis;if(!ss)return;ss.cancel();if(!nar||typeof SpeechSynthesisUtterance=="undefined")return;
+const u=new SpeechSynthesisUtterance(plain(x));u.lang="id-ID";u.rate=.95;const vo=ss.getVoices().find(q=>/^id([-_]|$)/i.test(q.lang));if(vo)u.voice=vo;
+u.onend=u.onerror=()=>{if(id==tok)sp=0};sp=1;ss.speak(u)}catch(e){sp=0}}
+function setShot(k){i=k;t=0;fd=0;pend=-1;const s=SH[k];$("cT").textContent=s.t;$("cL").textContent=s.loc;$("cS").textContent=s.say;$("cX").innerHTML=s.ex||"";
+$("cd").innerHTML=SH.map((_,j)=>"<i class='"+(j<k?"ok":j==k?"on":"")+"'></i>").join("");elF.style.opacity=0;speak(s.say)}
+function nx(d){if(fd>0)return;const k=i+d;if(k>=SH.length)return end();if(k<0)return;pend=k;fd=.45;elF.style.opacity=1}
+function upd(dt){const s=SH[i];if(!pz)t+=dt;let tx,tz;if(s.npc){tx=s.npc.g.position.x;tz=s.npc.g.position.z}else{tx=s.at[0];tz=s.at[1]}
+const u=Math.min(1,t/s.dur),e=u*u*(3-2*u),a=s.a0+s.da*e,r=s.r0+(s.r1-s.r0)*e,h=s.h0+(s.h1-s.h0)*e;
+cam.position.set(tx+Math.sin(a)*r,h,tz+Math.cos(a)*r);cam.lookAt(tx,s.ly,tz);
+bc.visible=!!s.npc;if(s.npc)bc.position.set(tx,9,tz);
+const lab=s.npc?s.npc.n:(s.pn||"");v3.set(tx,s.npc?4.6:5.5,tz).project(cam);
+if(lab&&v3.z<1&&Math.abs(v3.x)<1.1&&Math.abs(v3.y)<1.1){elP.style.display="block";elP.textContent="◆ "+lab;elP.style.left=((v3.x+1)/2*innerWidth)+"px";elP.style.top=((1-v3.y)/2*innerHeight)+"px"}else elP.style.display="none";
+if(fd>0){fd-=dt;if(fd<=0&&pend>=0){const k=pend;pend=-1;setShot(k)}}else if(!pz&&t>=s.dur&&(!sp||t>=s.dur+6))nx(1);
+ambient(dt,cam.position.x,cam.position.z)}
+function orbit(dt){oa+=dt*.06;cam.position.set(6+Math.sin(oa)*46,15+Math.sin(oa*.7)*3,12+Math.cos(oa)*46);cam.lookAt(6,3,12)}
+function play(f){if(on)return;on=1;CINEON=1;cb=f||null;SH=build();pz=0;$("cP").textContent="⏸";$("cV").textContent=nar?"🔊":"🔇";
+$("hud").style.display="none";$("start").style.display="none";if(started){UI=true;keys={};jv={x:0,y:0}}elC.style.display="block";setShot(0)}
+function end(){if(!on)return;on=0;CINEON=0;tok++;try{speechSynthesis.cancel()}catch(e){}elC.style.display="none";elF.style.opacity=0;bc.visible=false;elP.style.display="none";
+try{localStorage.setItem("pai_cine","1")}catch(e){}
+if(started){$("hud").style.display="block";UI=false;keys={};jv={x:0,y:0}}const f=cb;cb=null;if(f)f()}
+$("cNext").onclick=()=>nx(1);$("cPrev").onclick=()=>nx(-1);$("cSkip").onclick=end;
+$("cP").onclick=()=>{pz^=1;$("cP").textContent=pz?"▶":"⏸";try{pz?speechSynthesis.pause():speechSynthesis.resume()}catch(e){}};
+$("cV").onclick=()=>{nar=!nar;try{localStorage.setItem("pai_nar",nar?"1":"0")}catch(e){}$("cV").textContent=nar?"🔊":"🔇";if(nar)speak(SH[i].say);else{tok++;sp=0;try{speechSynthesis.cancel()}catch(e){}}};
+addEventListener("keydown",e=>{if(!on)return;if(e.code=="Escape")end();else if(e.code=="ArrowRight"||e.code=="Enter")nx(1);else if(e.code=="ArrowLeft")nx(-1);else if(e.code=="Space")$("cP").click()},true);
+return{play,upd,orbit,on:()=>on}})();
+function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.05);if(CINE.on())CINE.upd(dt);else if(started)step(dt);else{ambient(dt,cam.position.x,cam.position.z);CINE.orbit(dt)}R.render(scene,cam)}loop();
 /* ===== MENU AWAL ===== */
 const sv=load();if(sv){$("cont").style.display="block";$("nama").value=sv.name}
 let camSel=1;const setC=n=>{camSel=n;$("c1").classList.toggle("on",n==1);$("c2").classList.toggle("on",n==2)};$("c1").onclick=()=>setC(1);$("c2").onclick=()=>setC(2);
 function begin(first){$("start").style.display="none";$("hud").style.display="block";started=true;ecoInit();P.x=S.x;P.z=S.z;yaw=0;pitch=0;hud();setInterval(()=>{S.x=P.x;S.z=P.z;save()},4000);
 if(first)say("Selamat datang, "+S.name+"! 🏜️","Kamu tiba di negeri padang pasir pada masa lalu. Warga di sini menyimpan ilmu tentang agama Islam. Temui 6 tokoh bertanda ◆ kuning, pelajari materinya, lalu selesaikan tantangannya.\n\nMulailah dari "+N[0].n+" di Gua Hira (ikuti 🧭 kompas di kiri atas). Jangan lupa mampir ke Majelis Ilmu dekat masjid untuk bertanya pada Ustaz Fauzan.",[{t:"Mulai Menjelajah ▶",fn:()=>{hide();if(coarse)toast("Geser kiri = jalan, geser kanan = lihat")}},{t:"🎮 Cara Bermain",fn:howTo}]);else{UI=false;toast("Selamat datang kembali, "+S.name+"!")}}
-$("go").onclick=()=>{const n=$("nama").value.trim();if(!n){$("err").textContent="Tulis namamu dulu ya.";return}S={name:n,ms:MS.map(_=>0),qi:MS.map(_=>0),it:MS.map(_=>0),pts:0,cam:camSel,x:0,z:12,tr:0,tk:{},qa:{},eco:null};save();begin(1)};
+$("go").onclick=()=>{const n=$("nama").value.trim();if(!n){$("err").textContent="Tulis namamu dulu ya.";return}S={name:n,ms:MS.map(_=>0),qi:MS.map(_=>0),it:MS.map(_=>0),pts:0,cam:camSel,x:0,z:12,tr:0,tk:{},qa:{},eco:null};save();const g=()=>begin(1);let seen=0;try{seen=localStorage.getItem("pai_cine")}catch(e){}seen?g():CINE.play(g)};
 $("cont").onclick=()=>{S=Object.assign(S,sv);S.cam=camSel;begin(0)};
 $("how").onclick=()=>{$("start").style.display="none";howTo();$("db").firstChild.onclick=()=>{hide();$("start").style.display="flex"}};
+$("nama").addEventListener("keydown",e=>{if(e.key=="Enter")$("go").click()});
+$("tour").onclick=()=>CINE.play(()=>{$("start").style.display="flex"});
+{const d=sv?sv.ms.map(s=>s==3):[];$("bds").innerHTML=MS.map((m,k)=>'<i class="'+(d[k]?"on":"")+'" title="'+esc(m.badge)+'">'+esc(Array.from(m.badge)[0])+'</i>').join("");
+if(sv)$("cs").textContent="Halo, "+sv.name+" • ⭐ "+sv.pts+" • ✅ "+d.filter(Boolean).length+"/"+MS.length}
 </script>
 <div id="ytm" style="position:fixed;left:-400px;top:0;width:220px;height:220px;opacity:.01;pointer-events:none" aria-hidden="true"></div>
 <script>
