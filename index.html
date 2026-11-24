@@ -1,0 +1,1067 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Petualangan PAI: Negeri Padang Pasir (Voxel)</title><meta name="color-scheme" content="light dark">
+<style>
+:root{--pn:#fffaf0;--tx:#3b2a14;--ac:#c77d1a;--ac2:#2e7d32;--bg:#f2d9a6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--pn:#3a2d1a;--tx:#f6e7c8;--ac:#e9a23b;--bg:#2a2013}}
+:root[data-theme=dark]{--pn:#3a2d1a;--tx:#f6e7c8;--ac:#e9a23b;--bg:#2a2013}
+html,body{height:100%;margin:0;background:var(--bg);font-family:'Segoe UI',Tahoma,Arial,sans-serif;color:var(--tx);overflow:hidden;touch-action:none;user-select:none}
+canvas{display:block;width:100%;height:100%}
+.p{background:var(--pn);color:var(--tx);border-radius:14px;padding:6px 12px;font-size:14px;box-shadow:0 2px 8px #0004}
+#hud{position:fixed;inset:0;pointer-events:none;display:none}
+#hud>*{pointer-events:none}
+#tl{position:absolute;left:8px;top:calc(8px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:5px;max-width:62vw}
+#tr{position:absolute;right:8px;top:calc(8px + env(safe-area-inset-top,0px));display:flex;gap:6px}
+.ib{pointer-events:auto!important;border:0;border-radius:50%;width:44px;height:44px;font-size:20px;background:var(--pn);color:var(--tx);box-shadow:0 2px 8px #0005;cursor:pointer}
+#bE{position:absolute;right:16px;bottom:calc(30px + env(safe-area-inset-bottom,0px));width:70px;height:70px;background:var(--ac);color:#fff;font-weight:700;font-size:22px;display:none}
+#pr{position:absolute;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:none;text-align:center}
+#tt{position:absolute;left:50%;top:70px;transform:translateX(-50%);display:none;text-align:center;max-width:80vw}
+#joy{position:fixed;width:110px;height:110px;margin:-55px;border-radius:50%;background:#fff3;border:2px solid #fff8;display:none;pointer-events:none}
+#joy i{position:absolute;left:35px;top:35px;width:40px;height:40px;border-radius:50%;background:#fffc}
+.ov{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:#0006;z-index:5;padding:12px;box-sizing:border-box}
+.box{background:var(--pn);color:var(--tx);border-radius:18px;padding:18px 20px;max-width:560px;width:100%;max-height:88vh;overflow:auto;box-shadow:0 6px 30px #0008}
+.box h2{margin:0 0 8px;font-size:20px;color:var(--ac)}
+.box .t{white-space:pre-line;line-height:1.5;font-size:16px;margin-bottom:12px}
+.b{display:block;width:100%;margin:6px 0;padding:12px;border:2px solid var(--ac);background:transparent;color:var(--tx);border-radius:12px;font-size:16px;cursor:pointer;text-align:left}
+.b:hover,.b:active{background:var(--ac);color:#fff}
+.b.m{background:var(--ac);color:#fff;text-align:center;font-weight:700}
+#start{display:flex;background:linear-gradient(#f6c46b,#e8a94a 60%,#c98a3a)}
+input{width:100%;box-sizing:border-box;padding:12px;font-size:16px;border-radius:12px;border:2px solid var(--ac);background:var(--pn);color:var(--tx);margin:6px 0}
+.row{display:flex;gap:8px}.row .b{text-align:center}.row .on{background:var(--ac2);border-color:var(--ac2);color:#fff}
+.b.dis{opacity:.45}.b{white-space:pre-line}
+#jbp{background:var(--ac);color:#fff}
+
+/* ---- tampilan dialog materi (rapi & mudah dibaca) ---- */
+#dlg .box{display:flex;flex-direction:column;max-height:90vh;max-width:620px;padding:16px 18px;animation:pop .18s ease-out}
+@keyframes pop{from{transform:translateY(10px) scale(.97);opacity:0}to{transform:none;opacity:1}}
+#dlg .box h2{font-size:19px;margin:0 0 10px;padding-bottom:8px;border-bottom:2px solid rgba(199,125,26,.35)}
+#dt{overflow:auto;min-height:0;flex:1 1 auto;margin-bottom:8px;-webkit-overflow-scrolling:touch}
+#dt.rich{white-space:normal;line-height:1.55;font-size:15.5px}
+#db{flex:0 0 auto;max-height:46vh;overflow:auto}
+#db .b{font-size:15.5px;line-height:1.35;padding:11px 12px;border-radius:12px}
+.who{display:flex;align-items:center;gap:10px;margin:0 0 8px}
+.av{width:46px;height:46px;flex:0 0 46px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 2px 6px #0003}
+.who b{font-size:17px;display:block}.who small{display:block;opacity:.75;font-size:13px;line-height:1.3}
+.steps{display:flex;gap:6px;margin:8px 0 10px}
+.steps span{flex:1;text-align:center;font-size:12.5px;padding:5px 2px;border-radius:9px;background:rgba(128,128,128,.18);opacity:.65}
+.steps .on{background:var(--ac);color:#fff;opacity:1;font-weight:700}
+.steps .ok{background:var(--ac2);color:#fff;opacity:1}
+.sp{background:rgba(199,125,26,.14);border-left:4px solid var(--ac);border-radius:4px 12px 12px 4px;padding:10px 12px;margin:8px 0}
+.sec{font-weight:700;color:var(--ac);margin:14px 0 8px;font-size:15px;letter-spacing:.2px}
+ul.mt{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+ul.mt li{background:rgba(128,128,128,.13);border-radius:10px;padding:10px 12px;line-height:1.6;position:relative;padding-left:28px}
+ul.mt li:before{content:"";position:absolute;left:12px;top:17px;width:7px;height:7px;border-radius:50%;background:var(--ac)}
+ul.mt li b{color:var(--ac)}
+mark{background:rgba(46,125,50,.22);color:inherit;border-radius:5px;padding:0 4px;font-weight:600}
+.chip{display:inline-block;background:var(--ac);color:#fff;border-radius:20px;padding:3px 12px;font-size:13px;margin:2px 0 6px}
+.pg{height:9px;border-radius:6px;background:rgba(128,128,128,.28);overflow:hidden;margin:6px 0}
+.pg i{display:block;height:100%;background:var(--ac2);border-radius:6px}
+.q{font-size:17px;line-height:1.55;font-weight:600;background:rgba(128,128,128,.13);padding:13px;border-radius:12px;margin:6px 0}
+.res{border-radius:4px 12px 12px 4px;padding:10px 12px;margin:8px 0;background:rgba(128,128,128,.13)}
+.res.ok{background:rgba(46,125,50,.18);border-left:4px solid var(--ac2)}
+.res.no{background:rgba(211,47,47,.16);border-left:4px solid #d32f2f}
+</style></head><body>
+<canvas id="c"></canvas><div id="joy"><i></i></div>
+<div id="hud"><div id="tl"><div class="p" id="who"></div><div class="p" id="cmp"></div><div class="p" id="jbp" style="display:none"></div></div>
+<div id="tr"><button class="ib" id="bCam" title="Kamera (C)">📷</button><button class="ib" id="bHome" title="Rumah & Pekerjaan (H)">🏠</button><button class="ib" id="bMis" title="Misi (M)">📋</button><button class="ib" id="bMus" title="Musik (N)">🎵</button><button class="ib" id="bMenu" title="Menu (Esc)">☰</button></div>
+<div class="p" id="tt"></div><div class="p" id="pr"></div><button class="ib" id="bE">E</button></div>
+<div class="ov" id="start"><div class="box"><h2>🕌 Petualangan PAI: Negeri Padang Pasir</h2><div class="t">Jelajahi negeri padang pasir, temui para warga, selesaikan 6 misi PAI (BAB 1–5), dan kumpulkan semua lencana!</div>
+<input id="nama" maxlength="30" placeholder="Tulis namamu" autocomplete="off"><div id="err" style="color:#d32f2f;min-height:18px"></div>
+<div class="t" style="margin:4px 0">Pilih sudut pandang:</div><div class="row"><button class="b on" id="c1">👁️ First Person</button><button class="b" id="c2">🧍 Third Person</button></div>
+<button class="b m" id="go">▶ Mulai Petualangan</button><button class="b m" id="cont" style="display:none">↩ Lanjutkan Progres</button><button class="b" id="how">🎮 Cara Bermain</button></div></div>
+<div class="ov" id="dlg"><div class="box"><h2 id="dh"></h2><div class="t" id="dt"></div><div id="db"></div></div></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+"use strict";
+const $=i=>document.getElementById(i),T=THREE,rnd=(a,b)=>a+Math.random()*(b-a),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]);
+/* ===== DATA MATERI (sumber: Kisi-Kisi SAS PAI BAB 1–5) ===== */
+/* ===== TANYA JAWAB MAJELIS ILMU ===== */
+const QA=[[["Apa isi Q.S. Al-'Alaq ayat 1–5?","alaq isi wahyu iqra baca","Ayat 1–5 adalah wahyu pertama yang memerintahkan kita membaca dengan menyebut nama Tuhan yang menciptakan."],["Di mana wahyu pertama diterima?","hira gua dimana tempat","Nabi Muhammad saw. menerima wahyu pertama saat beribadah di Gua Hira."],["Apa hikmah perintah membaca?","hikmah membaca ilmu belajar","Membaca adalah salah satu cara memperoleh ilmu. Belajar tidak hanya saat ada tugas atau ujian."]],
+[["Apa itu sifat wajib Allah?","wajib pasti sifat","Sifat yang pasti dimiliki Allah, contoh: Wujud (ada), Qidam (terdahulu), Baqa' (kekal), Wahdaniyah (Esa)."],["Apa itu sifat mustahil?","mustahil lawan adam","Sifat yang tidak mungkin ada pada Allah, yaitu lawan sifat wajib. Lawan Wujud adalah Adam (tidak ada)."],["Apa itu sifat jaiz?","jaiz bebas kehendak","Allah bebas melakukan atau tidak melakukan sesuatu sesuai kehendak-Nya."]],
+[["Apa arti Al-Wahhab?","wahhab pemberi rezeki nikmat","Maha Pemberi. Semua rezeki dan nikmat berasal dari Allah; kita bersyukur dan meneladani dengan suka memberi."],["Apa arti Al-Baqa'?","baqa kekal abadi","Maha Kekal: Allah tidak pernah binasa."],["Apa itu Fana?","fana binasa mati makhluk","Fana artinya akan binasa. Semua makhluk pada akhirnya mati, hanya Allah yang kekal."]],
+[["Apa kandungan Q.S. Al-Isra' ayat 23?","isra ayat orang tua ibu","Perintah berbuat baik dan menghormati orang tua, misalnya membantu ibu dan mendengarkan nasihatnya."],["Bagaimana bersikap jika ditegur ibu?","tegur ibu marah maaf nasihat","Dengarkan nasihat dan minta maaf dengan sopan; jangan membantah atau menyimpan marah."],["Bagaimana cara menghormati guru?","guru hormat adab sapa bantu","Sapa dengan sopan, bantu bila perlu, tunggu penjelasan selesai sebelum membantu teman, dan jangan berkata kasar."]],
+[["Apa pengertian puasa?","pengertian puasa niat fajar magrib","Menahan diri dari hal yang membatalkan, disertai niat, sejak terbit fajar hingga terbenam matahari."],["Siapa yang wajib berpuasa?","syarat wajib islam balig berakal","Orang yang Islam, balig, dan berakal sehat."],["Apa yang membatalkan puasa?","batal membatalkan makan minum sengaja lupa","Makan atau minum dengan sengaja. Jika karena lupa, puasa tetap sah."],["Bagaimana puasa orang sakit?","sakit qada ganti","Orang sakit berat boleh tidak berpuasa, lalu menggantinya sesuai ketentuan (qada)."],["Apa sunah puasa dan hikmahnya?","sunah berbuka hikmah sabar peduli pahala","Sunah: menyegerakan berbuka. Hikmah: sabar, mengendalikan hawa nafsu, peduli sesama. Berbohong dan menggunjing mengurangi pahala."]],
+[["Apa beda Ahlul Hadar dan Ahlul Badui?","hadar badui beda menetap berpindah","Ahlul Hadar menetap di kota dan berdagang; Ahlul Badui berpindah-pindah di padang pasir mencari air dan rumput."],["Apa kebiasaan baik dan buruk mereka?","kebiasaan baik buruk judi mabuk tamu","Baik: menolong dan memuliakan tamu. Buruk: berjudi dan mabuk-mabukan."],["Mengapa menyembah berhala dilarang?","berhala patung latta sembah yahudi nasrani","Islam mengajarkan menyembah Allah Swt. saja. Sebagian dulu juga menganut Yahudi dan Nasrani, jadi kepercayaan mereka beragam."]]];
+const F=[];QA.forEach((t,i)=>t.forEach((e,j)=>F.push({i,k:i+"_"+j,q:e[0],kw:e[1],a:e[2]})));
+const CER=["Iqra'! Membaca adalah jalan memperoleh ilmu.","Allah Al-Baqa' (Maha Kekal); semua makhluk akan fana.","Allah Al-Wahhab, Maha Pemberi. Mari suka berbagi!","Berbaktilah kepada orang tua dan hormati guru.","Puasa melatih sabar dan mengendalikan hawa nafsu.","Ahlul Hadar menetap di kota, Ahlul Badui berpindah-pindah.","Silakan bertanya kepadaku, anak-anakku!"];
+// soal: [pertanyaan,[pilihan],indeksBenar,penjelasan]
+const MS=[
+{t:"Wahyu Pertama",b:"Q.S. Al-'Alaq 1–5",who:0,badge:"📖 Lencana Pembaca",
+mat:"Q.S. Al-'Alaq ayat 1–5 adalah wahyu pertama, diterima Nabi Muhammad saw. di Gua Hira. Isinya perintah membaca (Iqra') dengan menyebut nama Tuhan yang menciptakan.\nHikmahnya: membaca dan belajar adalah jalan memperoleh ilmu pengetahuan, dan itu tidak hanya dilakukan saat ada tugas atau ujian.",
+task:"Temukan 1 Lembaran Ilmu di dekat Gua Hira, lalu kembali ke Ustaz Hira.",items:[[-88,38,"Lembaran Ilmu"]],
+q:[["Wahyu pertama di Gua Hira memerintahkan manusia membaca. Hikmah yang dapat diambil adalah ...",["Belajar hanya saat ada tugas guru","Membaca adalah salah satu cara memperoleh ilmu","Orang pandai membaca tak perlu belajar hal lain","Mencari ilmu cukup saat akan ujian"],1,"Perintah membaca mengajarkan bahwa membaca adalah jalan memperoleh ilmu."],
+["Rani sulit memahami pelajaran, lalu membaca ulang buku dan bertanya kepada guru. Ini sesuai kandungan Q.S. ...",["Al-Fatihah: selalu berdoa","Al-Ikhlas: keesaan Allah","Al-'Alaq: pentingnya membaca dan belajar","An-Nas: berlindung kepada Allah"],2,"Q.S. Al-'Alaq mengajarkan pentingnya membaca dan belajar."]]},
+{t:"Sifat-Sifat Allah Swt.",b:"Sifat wajib, mustahil, jaiz",who:1,badge:"🌟 Lencana Pengenal Allah",
+mat:"Sifat wajib: sifat yang pasti dimiliki Allah Swt., misalnya Wujud (ada), Qidam (terdahulu), Baqa' (kekal), Wahdaniyah (Esa).\nSifat mustahil: lawan sifat wajib, tidak mungkin ada pada Allah, misalnya Adam (tidak ada).\nSifat jaiz: Allah bebas melakukan atau tidak melakukan sesuatu sesuai kehendak-Nya.",
+task:"",items:[],
+q:[["Allah memiliki sifat wajib Wujud. Sifat yang mustahil bagi Allah adalah ...",["Adam, karena Allah tidak mungkin tidak ada","Baqa', karena Allah tidak mungkin kekal","Qidam, karena Allah tidak mungkin terdahulu","Wahdaniyah, karena Allah tidak mungkin Esa"],0,"Lawan Wujud (ada) adalah Adam (tidak ada)."],
+["Allah bebas melakukan sesuatu atau tidak melakukannya sesuai kehendak-Nya. Ini menunjukkan sifat ...",["Mustahil, karena Allah tidak dapat berbuat","Wajib, karena semua perbuatan harus dilakukan","Jaiz, karena Allah bebas berbuat atau tidak","Fana, karena perbuatan Allah akan berakhir"],2,"Sifat jaiz berarti Allah bebas berbuat atau tidak berbuat."]]},
+{t:"Asmaul Husna",b:"Al-Wahhab, Al-Baqa', Fana",who:2,badge:"💎 Lencana Pemurah",
+mat:"Al-Wahhab artinya Maha Pemberi. Semua rezeki dan nikmat berasal dari Allah, maka kita bersyukur dan meneladani dengan suka memberi.\nAl-Baqa' artinya Maha Kekal: Allah tidak binasa.\nFana artinya akan binasa: semua makhluk pada akhirnya mati.",
+task:"",items:[],
+q:[["Dina mendapat sepeda baru dari orang tua dan sadar rezeki berasal dari Allah. Sikap sesuai Al-Wahhab adalah ...",["Memamerkan sepeda agar dipuji","Bersyukur kepada Allah dan memakai sepeda dengan baik","Merasa sepeda hasil usahanya sendiri","Melarang siapa pun mendekati sepedanya"],1,"Al-Wahhab: semua rezeki dari Allah, jadi kita bersyukur."],
+["(1) Allah kekal, tidak binasa. (2) Semua makhluk akan mati. (3) Allah memberi banyak nikmat. Pasangan yang tepat ...",["1 Al-Wahhab, 2 Al-Baqa'","1 Al-Baqa', 2 Fana, 3 Al-Wahhab","1 Fana, 2 Al-Wahhab, 3 Al-Baqa'","1 Al-Kabir, 2 Al-Wahhab, 3 Fana"],1,"Kekal = Al-Baqa', binasa = Fana, pemberi nikmat = Al-Wahhab."],
+["Arman memberi sebagian makanannya kepada teman yang tidak membawa bekal. Perilaku ini menunjukkan ...",["Manusia sama persis dengan Allah","Arman meneladani Al-Wahhab dengan suka memberi","Arman tak boleh menikmati makanannya","Semua makanan harus diberikan ke orang lain"],1,"Suka memberi adalah teladan dari makna Al-Wahhab."]]},
+{t:"Berbakti kepada Orang Tua & Guru",b:"Q.S. Al-Isra' ayat 23, adab",who:3,badge:"💛 Lencana Anak Saleh",
+mat:"Q.S. Al-Isra' ayat 23 memerintahkan kita berbuat baik dan menghormati orang tua: membantu ibu, mendengarkan nasihat, dan meminta maaf dengan sopan bila bersalah.\nKepada guru: hormati, sapa dengan sopan, bantu bila perlu, dan jangan berkata kasar. Ilmu harus disertai akhlak yang baik.",
+task:"",items:[],
+q:[["Ibu meminta diambilkan air; Adi segera berhenti bermain dan membantu. Sesuai Q.S. Al-Isra' ayat 23 karena ...",["Anak harus selalu meninggalkan kegiatannya","Anak diperintahkan menghormati dan berbuat baik kepada orang tua","Anak membantu hanya jika diberi hadiah","Anak harus mengerjakan semua pekerjaan sendiri"],1,"Al-Isra' ayat 23: berbuat baik dan hormat kepada orang tua."],
+["Riko tidak sengaja salah dan ditegur ibu. Sikap yang paling tepat adalah ...",["Membantah karena merasa benar","Pergi tanpa meminta maaf","Mendengarkan nasihat ibu dan meminta maaf dengan sopan","Diam tetapi menyimpan marah"],2,"Terima nasihat orang tua dan minta maaf dengan sopan."],
+["Seorang siswa pintar tetapi sering berkata kasar kepada gurunya. Menurut Islam ...",["Kepandaian lebih penting daripada kesopanan","Ilmu harus disertai sikap hormat dan akhlak baik","Siswa pandai boleh berbicara sesukanya","Hormat hanya untuk siswa kurang pandai"],1,"Ilmu harus disertai hormat dan akhlak baik."],
+["Siska bertemu gurunya di pasar yang sedang membawa banyak barang. Sikap hormat yang tepat ...",["Pura-pura tidak kenal","Menyapa sopan dan menawarkan bantuan","Memanggil guru keras dari jauh","Menunggu guru menyapa lebih dulu"],1,"Hormat kepada guru: menyapa sopan dan suka menolong."],
+["Saat guru menjelaskan, Beni melihat temannya kesulitan. Ia ingin membantu tanpa mengganggu guru. Tindakan terbaik ...",["Langsung berbicara dengan temannya saat guru menjelaskan","Mengabaikan temannya","Menunggu guru selesai menjelaskan, lalu membantu temannya","Meminta temannya keluar kelas"],2,"Hormati guru: tunggu penjelasan selesai, lalu bantu teman."]]},
+{t:"Puasa Ramadan",b:"Ketentuan, sunah, pembatal, hikmah",who:4,badge:"🌙 Lencana Ahli Puasa",
+mat:"Puasa: menahan diri dari hal yang membatalkan, disertai niat, sejak terbit fajar hingga terbenam matahari.\nSyarat wajib: Islam, balig, berakal. Orang sakit berat boleh tidak berpuasa lalu menggantinya (qada).\nSunah: menyegerakan berbuka. Makan/minum karena lupa tidak membatalkan; sengaja minum membatalkan. Berbohong dan menggunjing mengurangi pahala.\nHikmah: sabar, mengendalikan hawa nafsu, peduli sesama.",
+task:"Menjelang Magrib! Ambil 1 Kurma dan 1 Air Segar di Oasis, lalu kembali untuk berbuka bersama.",items:[[44,-26,"Kurma"],[62,-24,"Air Segar"]],
+q:[["Farhan Islam, balig, berakal. Rudi Islam tetapi belum balig. Bima Islam, balig, tetapi kehilangan akal. Yang wajib berpuasa ...",["Farhan, karena Islam, balig, dan berakal","Rudi, karena Islam sudah cukup","Bima, karena balig lebih penting","Ketiganya"],0,"Syarat wajib puasa: Islam, balig, berakal."],
+["Saat azan Magrib, Zahra segera berbuka dengan kurma dan air. Ini adalah ...",["Syarat wajib puasa","Sunah menyegerakan berbuka","Perbuatan yang membuat puasa tidak sah","Kewajiban mengganti puasa"],1,"Menyegerakan berbuka adalah sunah."],
+["Dito lupa sedang berpuasa lalu minum; setelah ingat ia berhenti. Hukum puasanya ...",["Batal","Tetap sah karena dilakukan dalam keadaan lupa","Batal dan wajib fidyah","Tidak sah"],1,"Makan/minum karena lupa tidak membatalkan puasa."],
+["Nanda sangat haus lalu sengaja minum air putih tanpa uzur. Akibatnya ...",["Tetap sah karena air bukan makanan","Puasanya batal karena minum dengan sengaja","Tetap sah jika segera berhenti","Makruh tetapi tidak batal"],1,"Minum dengan sengaja membatalkan puasa."],
+["Rafi lapar melihat makanan lezat tetapi tetap bersabar. Puasa melatih manusia untuk ...",["Menghindari semua makanan","Mengendalikan hawa nafsu dan bersabar","Tidak punya keinginan makan","Menunda makan berhari-hari"],1,"Hikmah puasa: mengendalikan hawa nafsu dan bersabar."],
+["Rina membagikan makanannya kepada tetangga yang tidak punya makanan berbuka. Hikmah puasa yang tampak ...",["Menumbuhkan kepedulian dan kasih sayang kepada sesama","Membiasakan mengurangi makan","Orang berpuasa harus selalu memberi makanan","Melatih diri tak butuh bantuan orang lain"],0,"Puasa menumbuhkan kepedulian sosial."],
+["Fajar berniat puasa sejak malam, lalu menahan makan dan minum sejak terbit fajar hingga terbenam matahari. Ini pengertian puasa, yaitu ...",["Menahan lapar sejak bangun tidur sampai Zuhur","Menahan diri dari hal yang membatalkan puasa disertai niat sejak terbit fajar hingga terbenam matahari","Tidak makan dan minum hanya di sekolah","Mengurangi makan siang tanpa berniat"],1,"Puasa = menahan diri dari pembatal, dengan niat, dari fajar sampai Magrib."],
+["Pak Hasan sakit berat dan dokter menyarankan agar tidak berpuasa. Sikap yang sesuai ajaran Islam ...",["Tetap berpuasa","Tidak berpuasa dan menggantinya sesuai ketentuan agama","Tidak berpuasa dan tidak perlu menggantinya","Mengganti puasa dengan hadiah untuk anak-anak"],1,"Orang sakit boleh tidak berpuasa, tetapi wajib menggantinya (qada)."],
+["Hasan diejek temannya dan marah, tetapi ingat bahwa ia sedang berpuasa. Tindakan terbaik ...",["Membalas ejekan agar temannya takut","Membentak temannya","Bersabar dan menghindari pertengkaran","Membatalkan puasa karena marah"],2,"Orang berpuasa menjaga akhlak: bersabar dan menghindari pertengkaran."],
+["Kegiatan: 1 membaca Al-Qur'an, 2 menggunjing teman, 3 membantu orang tua, 4 berbohong kepada guru, 5 memberi makanan berbuka kepada tetangga. Yang mengurangi pahala puasa ...",["1 dan 3","2 dan 4","1 dan 5","3 dan 5"],1,"Menggunjing dan berbohong mengurangi pahala puasa."],
+["Setelah puasa Ramadan sebulan, perubahan perilaku yang paling menunjukkan keberhasilan puasa ...",["Lebih sabar, jujur, disiplin, dan peduli kepada sesama","Lebih senang membeli makanan dalam jumlah banyak","Merasa lebih baik daripada teman yang tidak berpuasa","Rajin ibadah hanya selama Ramadan"],0,"Puasa yang berhasil membentuk akhlak: sabar, jujur, disiplin, peduli."]]},
+{t:"Masyarakat Arab Pra-Islam",b:"Ahlul Hadar & Badui, kebiasaan",who:5,badge:"🏜️ Lencana Penjelajah Sejarah",
+mat:"Masyarakat Arab sebelum Islam terdiri dari dua kelompok. Ahlul Hadar: menetap di kota dan banyak berdagang. Ahlul Badui: hidup berpindah-pindah di padang pasir mencari air dan rumput untuk ternak.\nKebiasaan baik: menolong dan memuliakan tamu. Kebiasaan buruk: berjudi, mabuk-mabukan. Sebagian menyembah berhala (misalnya Latta), sebagian menganut Yahudi atau Nasrani.\nTeladan: contoh yang baik, hindari yang buruk sesuai ajaran Islam.",
+task:"",items:[],
+q:[["Sebagian Arab pra-Islam suka menolong dan menghormati tamu, sebagian berjudi dan mabuk. Kesimpulannya ...",["Semua berperilaku buruk","Mereka tidak mengenal aturan","Kehidupan mereka memiliki kebiasaan baik dan buruk","Semua sudah menjalankan Islam"],2,"Ada kebiasaan baik dan buruk pada masyarakat Arab pra-Islam."],
+["Keluarga Salim tinggal di padang pasir dan berpindah-pindah mencari air dan rumput. Mereka termasuk ...",["Ahlul Hadar","Ahlul Badui","Kaum Quraisy di kota","Kaum pedagang"],1,"Hidup berpindah-pindah = Ahlul Badui."],
+["Kelompok A menetap di kota dan berdagang. Kelompok B berpindah-pindah di padang pasir. Perbedaan yang tepat ...",["A Ahlul Badui, B Ahlul Hadar","A Ahlul Hadar, B Ahlul Badui","Keduanya Ahlul Hadar","Keduanya Ahlul Badui"],1,"Menetap di kota = Hadar; berpindah-pindah = Badui."],
+["Sebagian Arab menyembah patung seperti Latta di sekitar Ka'bah. Ini bertentangan dengan Islam karena ...",["Islam mengajarkan banyak Tuhan","Islam mengajarkan menyembah Allah Swt. saja","Semua buatan manusia harus disembah","Manusia boleh menyembah apa pun"],1,"Islam mengajarkan menyembah Allah Swt. saja."],
+["Damar tahu ada kebiasaan baik (menolong tamu) dan buruk (berjudi) pada masa jahiliah. Tindakan yang tepat ...",["Meniru semua kebiasaan","Menolak semua kebiasaan lama","Mencontoh yang baik dan menghindari yang buruk sesuai Islam","Berjudi boleh jika sudah tradisi"],2,"Ambil teladan yang baik, hindari yang buruk."],
+["Ahmad membaca bahwa ada kelompok Arab yang menetap di kota dan bekerja sebagai pedagang. Kelompok itu disebut ...",["Ahlul Badui","Ahlul Hadar","Kaum Muhajirin","Kaum Ansar"],1,"Menetap di kota dan berdagang = Ahlul Hadar."],
+["Selain menyembah berhala, sebagian Arab pra-Islam menganut Yahudi dan Nasrani. Ini menunjukkan bahwa ...",["Semua memiliki kepercayaan yang sama","Kepercayaan mereka beragam","Semua sudah memeluk Islam","Tidak ada yang mengenal agama"],1,"Kepercayaan masyarakat Arab pra-Islam beragam."]]}];
+const NQ=MS.reduce((a,m)=>a+m.q.length,0),MAXP=NQ*10+MS.length*20+F.length*2;
+// NPC: nama, peran, x,z, jubah, penutup kepala, kulit, perempuan?, misi(-1 ambient), kalimat, patroli [x,z]
+const N=[
+{n:"Ustaz Hira",x:-62,z:46,r:0x6d4c41,h:0xffffff,s:0xc68642,m:0},
+{n:"Syekh Kamil",x:-40,z:-14,r:0xf5f0e1,h:0x2e7d32,s:0xd2a679,m:1},
+{n:"Pak Wahab (Pedagang)",x:27,z:17,r:0x1565c0,h:0xf5f0e1,s:0xc68642,m:2},
+{n:"Ibu Aminah",x:-14,z:17,r:0x6a1b9a,h:0x4a148c,s:0xe0b88f,f:1,m:3},
+{n:"Pak Zaid (Penjual Kurma)",x:37,z:17,r:0xb71c1c,h:0xf5f0e1,s:0xa9744f,m:4},
+{n:"Tetua Salim (Badui)",x:80,z:65,r:0xa1887f,h:0x5d4037,s:0xb07d52,m:5},
+{n:"Pak Guru Hasan",x:7,z:-19,r:0xeceff1,h:0x37474f,s:0xd2a679,m:-1,say:["Anak-anak, hormati gurumu ya. Sapa dengan sopan dan bantu bila ia membawa barang.","Ingat: ilmu yang bermanfaat harus disertai akhlak yang baik."]},
+{n:"Fajar (Anak Kecil)",x:3,z:6,r:0xfbc02d,h:0xffffff,s:0xd2a679,m:-1,k:.75,p:[-4,10],say:["Aku sedang belajar puasa! Aku niat sejak malam, lalu menahan lapar dari fajar sampai Magrib.","Kata ibu, puasa itu melatih sabar. Kamu sudah bertemu Ibu Aminah?"]},
+{n:"Penjaga Oasis",x:48,z:-24,r:0x00695c,h:0xf5f0e1,s:0xa9744f,m:-1,say:["Mata air oasis ini adalah nikmat dari Allah, Al-Wahhab, Maha Pemberi.","Bila kemarau panjang, air bisa surut. Semua makhluk akan fana, hanya Allah yang Al-Baqa', Maha Kekal."]},
+{n:"Bu Salma (Pedagang Kain)",x:35,z:28,r:0xe65100,h:0xbf360c,s:0xe0b88f,f:1,m:-1,say:["Kami Ahlul Hadar: menetap di kota dan berdagang. Pasar ini tempat kami mencari rezeki.","Berjualan dengan jujur itu bagian dari akhlak terpuji."]},
+{n:"Salman (Penggembala)",x:60,z:46,r:0x8d6e63,h:0x4e342e,s:0xb07d52,m:-1,p:[60,68],say:["Aku Ahlul Badui. Kami berpindah-pindah mencari air dan rumput bagi unta dan domba.","Walau hidup di gurun, kami memuliakan tamu. Itu kebiasaan baik!"]},
+{n:"Pak Rasyid (Musafir)",x:10,z:30,r:0x455a64,h:0xf5f0e1,s:0xc68642,m:-1,p:[24,24],say:["Aku musafir dari kota jauh. Dulu orang Arab ada yang berjudi dan mabuk. Islam mengajarkan menjauhinya.","Sebagian dulu menyembah patung, tetapi Islam mengajarkan menyembah Allah Swt. saja."]}];
+N.push({n:"Ustaz Fauzan (Penceramah)",x:-54,z:-8.4,r:0xf5f0e1,h:0x1b5e20,s:0xc68642,m:-1,cr:1,by:.4,fix:0,p:[-51.5,-8.4]});
+[["Zahra",0xd81b60,0xad1457,1,["Ssst... Ustaz Fauzan sedang berceramah. Dengarkan lalu bertanya ya!","Tadi Ustaz bilang: sunah berbuka itu disegerakan dengan kurma dan air."]],
+["Rafi",0x1565c0,0xf5f0e1,0,["Aku baru tahu sifat wajib Allah ada Wujud, Qidam, Baqa', dan Wahdaniyah.","Lawan Wujud itu Adam, artinya tidak ada. Itu mustahil bagi Allah!"]],
+["Nadia",0x00897b,0x004d40,1,["Q.S. Al-'Alaq 1–5 itu wahyu pertama. Isinya perintah membaca.","Aku jadi semangat membaca setiap hari."]],
+["Dimas",0xef6c00,0xf5f0e1,0,["Al-Wahhab artinya Maha Pemberi. Aku mau berbagi bekal ke teman.","Fana itu artinya binasa. Semua makhluk akan fana."]],
+["Rina",0x7b1fa2,0x4a148c,1,["Kata Ustaz, jika ibu menegur, dengarkan dan minta maaf dengan sopan.","Hormati guru dengan menyapa dan membantu, bukan berkata kasar."]],
+["Hasan",0x558b2f,0xf5f0e1,0,["Kalau diejek saat puasa, aku akan bersabar dan menghindari pertengkaran.","Puasa Ramadan melatih sabar, jujur, disiplin, dan peduli."]],
+["Salsa",0xf9a825,0xe65100,1,["Syarat wajib puasa: Islam, balig, dan berakal sehat.","Kalau lupa lalu makan, puasanya tetap sah, lho."]],
+["Ilham",0x37474f,0xf5f0e1,0,["Ahlul Hadar menetap di kota; Ahlul Badui berpindah-pindah.","Dulu ada kebiasaan baik seperti menolong tamu, dan buruk seperti berjudi."]]].forEach((a,i)=>N.push({n:"Pendengar: "+a[0],x:-58+(i%3)*4,z:-2+Math.floor(i/3)*4,r:a[1],h:a[2],f:a[3],s:[0xd2a679,0xc68642,0xe0b88f][i%3],m:-1,k:i%3==1?.85:1,sit:1,fix:Math.PI,say:a[4]}));
+const LN_a=["Aku bekerja dengan jujur. Rezeki dari Allah, Al-Wahhab, patut disyukuri.","Di kota, Ahlul Hadar menetap dan hidup dari berdagang atau bertukang."],LN_t=["Kain ini kutenun dengan teliti dan dijual dengan harga jujur.","Berdagang jujur itu akhlak terpuji."],LN_f=["Pohon kurma ini nikmat dari Allah. Kami bersyukur setiap panen.","Kalau panen melimpah, kami suka berbagi dengan tetangga."],LN_k=["Ayo main! Tapi kalau ibu memanggil, aku segera pulang membantu.","Kata ustaz, anak yang baik berbakti kepada orang tua."],LN_u=["Selamat datang, tamu! Memuliakan tamu adalah kebiasaan baik orang Arab sejak dulu.","Kafilah dagang berpindah dari kota ke kota membawa barang dagangan."],LN_g=["Domba-domba ini harus dijaga. Kami berpindah mencari rumput dan air.","Ahlul Badui berpindah-pindah, Ahlul Hadar menetap di kota."],LN_w=["Antre dengan sabar, ya. Air adalah nikmat dari Allah.","Semua makhluk akan fana, hanya Allah yang kekal."],LN_b=["Pekerjaan berat, tapi dikerjakan dengan sabar dan jujur.","Bekerja keras demi keluarga adalah perbuatan baik."];
+const NA=(n,x,z,r,h,s,o)=>N.push(Object.assign({n,x,z,r,h,s,m:-1},o)),W=0xf5f0e1,PI=Math.PI;
+NA("Pandai Besi Hamid",0,-63.4,0x5d4037,0x37474f,0xa9744f,{act:"hammer",fix:PI,say:LN_a});NA("Pengrajin Idris",-18,-92,0xa1887f,W,0xc68642,{act:"spin",fix:0,say:LN_a});NA("Penenun Laila",18,-60.2,0xad1457,0x880e4f,0xe0b88f,{f:1,act:"spin",fix:PI,say:LN_t});NA("Pembawa Air Yusuf",-4,-48,0x4e342e,W,0xb07d52,{p:[30,-48],say:LN_w});
+NA("Anak: Umar",16,-50,0x2e7d32,W,0xd2a679,{k:.75,act:"catch",fix:PI/2,say:LN_k});NA("Anak: Aisyah",24,-50,0xd81b60,0xad1457,0xe0b88f,{k:.75,f:1,act:"catch",fix:-PI/2,say:LN_k});
+NA("Petani Ali",-95,-95.5,0x6d4c41,W,0xa9744f,{act:"harvest",fix:0,say:LN_f});NA("Petani Umar",-80,-85,0x33691e,W,0xc68642,{act:"harvest",fix:PI/2,say:LN_f});NA("Petani Siti",-104,-80,0x00695c,0x004d40,0xe0b88f,{f:1,act:"harvest",fix:-PI/2,say:LN_f});
+NA("Penjaga Penginapan Harun",108,-17,0x455a64,W,0xc68642,{fix:0,say:LN_u});NA("Pedagang Kafilah Jamal",118,-24,0xb71c1c,0xffffff,0xa9744f,{say:LN_u});NA("Pedagang Unta Hakim",113,33,0x1565c0,W,0xb07d52,{say:LN_u});NA("Penjual Pelana Rashid",104,34,0x6a1b9a,0x4a148c,0xc68642,{say:LN_t});
+NA("Gembala Bilal",18,87.5,0x8d6e63,0x4e342e,0xb07d52,{say:LN_g});NA("Antrean: Fatimah",1.8,60.5,0xc2185b,0x880e4f,0xe0b88f,{f:1,say:LN_w});NA("Antrean: Maryam",3.6,62,0x7b1fa2,0x4a148c,0xe0b88f,{f:1,say:LN_w});NA("Antrean: Ibrahim",5.4,63.5,0xef6c00,W,0xc68642,{say:LN_w});
+NA("Anak: Zaid",28,62,0xfbc02d,W,0xd2a679,{k:.75,act:"play",say:LN_k});NA("Anak: Maya",32,62,0x00acc1,0x006064,0xe0b88f,{k:.75,f:1,act:"play",say:LN_k});NA("Anak: Farid",30,66,0x43a047,W,0xc68642,{k:.75,act:"play",say:LN_k});
+NA("Pemahat Batu Zakir",-106,-6,0x795548,W,0xa9744f,{act:"hammer",fix:-PI/2,say:LN_b});NA("Pengangkut Batu Karim",-112,-20,0x5d4037,0x4e342e,0xb07d52,{p:[-98,10],say:LN_b});NA("Ibu Zainab (Badui)",116,112,0x6d4c41,0x3e2723,0xb07d52,{f:1,say:LN_g});NA("Anak Badui: Faris",118,108,0xa1887f,0x5d4037,0xb07d52,{k:.75,act:"play",say:LN_k});
+const EN=(n,x,z,r,h,s,o)=>N.push(Object.assign({n,x,z,r,h,s,m:-1,eco:1},o));
+EN("Juragan Ubaid (Pemilik Unta)",94,16,0x6d4c41,W,0xb07d52,{job:"unta"});EN("Gembala Sulaiman",-22,44,0x8d6e63,0x4e342e,0xb07d52,{job:"domba"});EN("Peternak Qasim",34,80,0x33691e,W,0xc68642,{job:"pakan"});EN("Pedagang Sibuk Zubair",44,26,0xe65100,0xbf360c,0xa9744f,{job:"dagang"});EN("Pak Rahim (Pembawa Air)",62,-18,0x00695c,W,0xc68642,{job:"air"});
+EN("Pak Makelar Idris (Agen Rumah)",69,78,0x1565c0,W,0xc68642,{agen:1});EN("Pak Tijarah (Toko Perabot & Ternak)",69,102,0x6a1b9a,0xf5f0e1,0xa9744f,{shop:1});
+/* ===== STATE & SIMPAN ===== */
+const KEY="pai_gurun_v1";let S={name:"",ms:MS.map(_=>0),qi:MS.map(_=>0),it:MS.map(_=>0),pts:0,cam:1,x:0,z:12,tr:0,tk:{},qa:{},eco:null};
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.name)return j}catch(e){}return null}
+/* ===== THREE ===== */
+const cv=$("c"),R=new T.WebGLRenderer({canvas:cv,antialias:false,powerPreference:"high-performance"});R.setPixelRatio(Math.min(devicePixelRatio||1,1.5));
+const scene=new T.Scene(),cam=new T.PerspectiveCamera(65,1,.1,340);cam.rotation.order="YXZ";
+scene.background=new T.Color(0xf2d9a6);scene.fog=new T.Fog(0xf2d9a6,90,300);
+scene.add(new T.HemisphereLight(0xfff1d0,0xb98f55,.95));const sun=new T.DirectionalLight(0xffffff,.6);sun.position.set(60,90,30);scene.add(sun);
+/* ===== MESIN VOXEL / PIXEL — gaya Minecraft (benda, karakter, hewan) ===== */
+const TILE=2,PXU=.065,_BG=T.BoxGeometry,_MB=T.MeshBasicMaterial;
+const hsh=s=>{let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0};
+const rng=seed=>{let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}};
+const rgbOf=h=>[(h>>16)&255,(h>>8)&255,h&255];
+const mix=(a,b,t)=>{const x=rgbOf(a),y=rgbOf(b);return(Math.round(x[0]+(y[0]-x[0])*t)<<16)|(Math.round(x[1]+(y[1]-x[1])*t)<<8)|Math.round(x[2]+(y[2]-x[2])*t)};
+const css=(h,f)=>{const c=rgbOf(h);return"rgb("+c.map(v=>cl(Math.round(v*(f||1)),0,255)).join(",")+")"};
+const cdist=(a,b)=>{const p=rgbOf(a),q=rgbOf(b);return Math.abs(p[0]-q[0])+Math.abs(p[1]-q[1])+Math.abs(p[2]-q[2])};
+function mkCanvas(w,h){const c=document.createElement("canvas");c.width=w;c.height=h;return c}
+function pxTex(c,mip){const t=new T.CanvasTexture(c);t.magFilter=T.NearestFilter;if(mip){t.wrapS=t.wrapT=T.RepeatWrapping;t.minFilter=T.NearestMipmapLinearFilter}else{t.minFilter=T.NearestFilter;t.generateMipmaps=false}return t}
+// kuas piksel: setiap piksel diberi variasi terang/gelap kecil (tekstur ala Minecraft)
+const painter=(ctx,r)=>(x,y,w,h,c,v)=>{v=v==null?.07:v;for(let i=0;i<w;i++)for(let j=0;j<h;j++){ctx.fillStyle=css(c,1+(r()-.5)*2*v);ctx.fillRect(x+i,y+j,1,1)}};
+
+/* --- tekstur blok 16x16 untuk semua benda dunia (pasir, dinding, kayu, batu, dll.) --- */
+const TXC={},MT={};
+function blockTex(c){if(TXC[c])return TXC[c];const Z=32,cv=mkCanvas(Z,Z),x=cv.getContext("2d"),r=rng(c*31+7),bl=[];for(let i=0;i<6;i++)bl.push([r()*Z,r()*Z,5+r()*7,.9+r()*.2]);
+ for(let j=0;j<Z;j++)for(let i=0;i<Z;i++){let f=.95+r()*.1;for(const q of bl){const d=Math.hypot(i-q[0],j-q[1]);if(d<q[2])f*=1+(q[3]-1)*(1-d/q[2])*.8}const q=r();if(q<.05)f*=.88;else if(q>.96)f*=1.08;if(i==0||j==0)f*=.94;x.fillStyle=css(c,f);x.fillRect(i,j,1,1)}
+ return TXC[c]=pxTex(cv,1)}
+const M=c=>MT[c]||(MT[c]=new T.MeshLambertMaterial({map:blockTex(c),flatShading:true}));
+let NZT=null;function nzTex(){if(NZT)return NZT;const cv=mkCanvas(8,8),x=cv.getContext("2d"),r=rng(5);for(let j=0;j<8;j++)for(let i=0;i<8;i++){const v=Math.round(212+r()*43);x.fillStyle="rgb("+v+","+v+","+v+")";x.fillRect(i,j,1,1)}return NZT=pxTex(cv,0)}
+T.MeshBasicMaterial=function(p){return new _MB(Object.assign({map:nzTex()},p))};
+
+/* --- geometri blok: UV mengikuti ukuran agar piksel selalu seragam --- */
+function boxUVs(g,w,h,d){const uv=g.attributes.uv,s=[[d,h],[d,h],[w,d],[w,d],[w,h],[w,h]];for(let f=0;f<6;f++)for(let v=0;v<4;v++){const i=f*4+v;uv.setXY(i,uv.getX(i)*s[f][0]/TILE,uv.getY(i)*s[f][1]/TILE)}return g}
+function mergeG(list){const pos=[],nor=[],uv=[],idx=[];let o=0;list.forEach(g=>{const p=g.attributes.position,n=g.attributes.normal,u=g.attributes.uv,ix=g.index.array;for(let i=0;i<p.count;i++){pos.push(p.getX(i),p.getY(i),p.getZ(i));nor.push(n.getX(i),n.getY(i),n.getZ(i));uv.push(u.getX(i),u.getY(i))}for(let i=0;i<ix.length;i++)idx.push(ix[i]+o);o+=p.count});
+ const m=new T.BufferGeometry();m.setAttribute("position",new T.Float32BufferAttribute(pos,3));m.setAttribute("normal",new T.Float32BufferAttribute(nor,3));m.setAttribute("uv",new T.Float32BufferAttribute(uv,2));m.setIndex(idx);return m}
+const vb=(w,h,d,x,y,z)=>boxUVs(new _BG(w,h,d),w,h,d).translate(x,y,z);
+function steps(r,h,n){const L=[];for(let i=0;i<n;i++){const f=1-i/n,s=2*r*f*.85+.0001,hh=h/n;L.push(vb(s,hh,s,0,-h/2+hh*(i+.5),0))}return mergeG(L)}
+function domeG(r){const n=r>2?6:4,L=[];for(let i=0;i<n;i++){const hh=r/n,f=Math.sqrt(1-Math.pow((i+.5)/n,2)),s=2*r*f*.9;L.push(vb(s,hh,s,0,i*hh+hh/2,0))}return mergeG(L)}
+// semua bentuk bulat/kerucut diganti blok: silinder->balok, bola->kubus, kerucut->piramida bertingkat, kubah->kubah bertingkat
+T.CylinderGeometry=function(a,b,h){const w=(a+b)*.9;return boxUVs(new _BG(w,h,w),w,h,w)};
+T.SphereGeometry=function(r,ws,hs,ps,pl,ts,tl){if(tl!==undefined&&tl<2)return domeG(r);const s=r*1.75;return boxUVs(new _BG(s,s,s),s,s,s)};
+T.ConeGeometry=function(r,h,s){const n=s==7?10:Math.max(3,Math.min(6,Math.round(h*1.6)));return steps(r,h,n)};
+T.OctahedronGeometry=function(r){const s=r*1.25,g=new _BG(s,s,s);g.rotateX(.6155);g.rotateZ(.7854);return g};
+T.CircleGeometry=function(r){const c=Math.max(.8,r/12),L=[];for(let x=-r+c/2;x<r;x+=c)for(let y=-r+c/2;y<r;y+=c)if(x*x+y*y<=r*r)L.push(vb(c,c,.05,x,y,0));return mergeG(L)}
+/* ===== MODEL VOXEL BERWARNA (vertex color + tekstur halus 32px) ===== */
+const MC=new T.MeshLambertMaterial({map:blockTex(0xffffff),vertexColors:true});
+const VR=rng(2026),BGc={},RG={};
+function cvb(w,h,d,x,y,z,c,ry,v){const g=boxUVs(new _BG(w,h,d),w,h,d);if(ry)g.rotateY(ry);g.translate(x,y,z);const k=1+(VR()-.5)*(v==null?.1:v),q=rgbOf(c),n=g.attributes.position.count,a=new Float32Array(n*3);for(let i=0;i<n;i++){a[i*3]=cl(q[0]/255*k,0,1);a[i*3+1]=cl(q[1]/255*k,0,1);a[i*3+2]=cl(q[2]/255*k,0,1)}g.setAttribute("color",new T.BufferAttribute(a,3));return g}
+function mergeC(L){const pos=[],nor=[],uv=[],co=[],idx=[];let o=0;L.forEach(g=>{const p=g.attributes.position,n=g.attributes.normal,u=g.attributes.uv,c=g.attributes.color,ix=g.index.array;for(let i=0;i<p.count;i++){pos.push(p.getX(i),p.getY(i),p.getZ(i));nor.push(n.getX(i),n.getY(i),n.getZ(i));uv.push(u.getX(i),u.getY(i));co.push(c.getX(i),c.getY(i),c.getZ(i))}for(let i=0;i<ix.length;i++)idx.push(ix[i]+o);o+=p.count});
+ const m=new T.BufferGeometry();m.setAttribute("position",new T.Float32BufferAttribute(pos,3));m.setAttribute("normal",new T.Float32BufferAttribute(nor,3));m.setAttribute("uv",new T.Float32BufferAttribute(uv,2));m.setAttribute("color",new T.Float32BufferAttribute(co,3));m.setIndex(idx);return m}
+/* --- pohon kurma: batang bercincin, 8 pelepah melengkung + anak daun, tandan kurma --- */
+let _PG=null;
+function palmGeos(){if(_PG)return _PG;const tr=[],lf=[],B1=0x8d6e63,B2=0x7a5a45,G=[0x2e8b3a,0x3fa04a,0x277a33];let sx=0;
+ for(let i=0;i<8;i++){const w=.52-.035*i,y=i*.72;sx=Math.sin(i*.5)*.035*i;tr.push(cvb(w,.72,w,sx,y+.36,0,i%2?B1:B2,0,.12));tr.push(cvb(w+.1,.09,w+.1,sx,y+.04,0,0x6a4b3a,0,.1))}
+ tr.push(cvb(.95,.28,.95,0,.14,0,0x735441));[[.5,.5],[-.5,.5],[.5,-.5],[-.5,-.5]].forEach(a=>tr.push(cvb(.28,.34,.28,a[0],.12,a[1],0x6d4c3a)));
+ const top=5.76,tx=sx;lf.push(cvb(.95,.4,.95,tx,top+.15,0,0x2a6f32));
+ for(let k=0;k<7;k++){const a=k/7*6.2832+(k%2?.19:0);let rr=.4,yy=top+.25;for(let s=0;s<4;s++){const ln=.62,wd=.34-.06*s,hx=Math.cos(a)*(rr+ln/2)+tx,hz=-Math.sin(a)*(rr+ln/2);lf.push(cvb(ln,.13,wd,hx,yy,hz,G[(s+k)%3],a,.14));if(s>0&&s<4)lf.push(cvb(.13,.06,1.1-s*.17,hx,yy-.05,hz,G[(s+k+1)%3],a,.14));rr+=ln;yy-=s<1?.05:.22}}
+ [[.5,.3],[-.4,.5],[.2,-.6],[-.5,-.3]].forEach((a,i)=>{lf.push(cvb(.2,.3,.2,tx+a[0],top-.15,a[1],i%2?0xb0561e:0x8a3e18,0,.1));lf.push(cvb(.17,.26,.17,tx+a[0]*1.15+.12,top-.4,a[1]*1.15,0xc2701f,0,.1))});
+ return _PG={t:mergeC(tr),l:mergeC(lf)}}
+/* --- pohon akasia: batang bercabang + kanopi payung berlapis --- */
+let _AG=null;
+function acaciaGeo(){if(_AG)return _AG;const r=rng(33),L=[],T0=0x6d4c41,T1=0x5a3d2e,GG=[0x4c8a3a,0x5ca048,0x3e7a2e,0x6aae55];
+ L.push(cvb(.7,.5,.7,0,.25,0,T1));L.push(cvb(.5,1.2,.5,0,1.1,0,T0));L.push(cvb(.42,.8,.42,.05,2.1,0,T1));
+ L.push(cvb(.3,.9,.3,-.4,2.7,.05,T0));L.push(cvb(.3,.7,.3,-.8,3.2,.1,T1));L.push(cvb(.3,.9,.3,.45,2.7,-.05,T0));L.push(cvb(.3,.7,.3,.85,3.15,-.1,T1));L.push(cvb(.28,.7,.28,.05,3.0,.45,T0));
+ for(let i=-2;i<=2;i++)for(let j=-2;j<=2;j++){const d=Math.hypot(i,j);if(d>2.4)continue;const h=.34+r()*.2;L.push(cvb(1.05,h,1.05,i+(r()-.5)*.2,3.55+(2.2-d)*.1,j+(r()-.5)*.2,GG[(i*3+j*5+9)%4],0,.1))}
+ for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++)if(r()<.8)L.push(cvb(.9,.3,.9,i*.95,4.05,j*.95,GG[(i+j+5)%4],0,.1));
+ [[-2.3,0],[2.2,.5],[0,-2.3],[.4,2.2],[-1.6,1.7],[1.7,-1.7]].forEach(a=>L.push(cvb(.5,.4,.5,a[0],3.2,a[1],GG[2],0,.1)));
+ return _AG=mergeC(L)}
+/* --- batu: gundukan / menara / lempeng, bertingkat, ada pasir, kerikil & lumut --- */
+function rockGeo(seed,kind){const key=seed+"_"+kind;if(RG[key])return RG[key];const r=rng(seed*977+kind),L=[],P=kind==2?[0xb59a76,0xa88f6b,0xc4ab86,0x9c845f]:[0x8f877a,0x9a9082,0x7d756a,0xa59b8c],pk=()=>P[Math.floor(r()*4)];
+ L.push(cvb(2.5+r()*.4,.07,2.1+r()*.4,0,.035,0,0xd9b873,r()*3,.08));
+ if(kind==0){L.push(cvb(1.7,.55,1.35,0,.3,0,P[2],r()*.4));L.push(cvb(1.2,.5,1.0,.1,.78,-.05,P[0],r()*.5));L.push(cvb(.8,.38,.62,.05,1.15,0,P[1],r()*.6));L.push(cvb(.55,.22,.4,.05,1.4,0,P[3],r()*.6));L.push(cvb(.8,.42,.7,-.95,.23,.55,pk(),.5));L.push(cvb(.55,.3,.5,-.95,.5,.5,P[3],.6));L.push(cvb(.6,.35,.55,.9,.2,-.6,pk(),-.4))}
+ else if(kind==1){L.push(cvb(1.3,.5,1.1,0,.28,0,P[2],.2));L.push(cvb(.95,.9,.8,0,.95,0,P[0],.3));L.push(cvb(.7,.8,.6,.05,1.75,0,P[1],.4));L.push(cvb(.45,.55,.4,.08,2.4,0,P[3],.5));L.push(cvb(.55,.4,.5,.9,.22,.3,pk(),.3));L.push(cvb(.4,.3,.4,-.85,.17,-.4,pk(),.1))}
+ else{L.push(cvb(2.0,.35,1.5,0,.2,0,P[2],.1));L.push(cvb(1.7,.3,1.3,.1,.5,.05,P[0],.35));L.push(cvb(1.3,.3,1.0,-.1,.78,0,P[1],.6));L.push(cvb(.8,.25,.6,.1,1.03,.05,P[3],.8));L.push(cvb(.7,.3,.9,1.15,.18,.1,pk(),-.3))}
+ for(let i=0;i<5;i++){const a=r()*6.28,d=1.2+r()*.5,s=.12+r()*.12;L.push(cvb(s,s*.8,s,Math.cos(a)*d,s*.4,Math.sin(a)*d,pk(),r()*3))}
+ if(kind!=1)L.push(cvb(.5,.05,.4,.1,kind==0?1.43:1.04,0,0x8a9a4a,.4));
+ return RG[key]=mergeC(L)}
+/* --- semak: hijau / kering berduri / berbunga --- */
+function bushGeo(k){if(BGc["b"+k])return BGc["b"+k];const r=rng(500+k),L=[],G=k==1?[0x8a8a4a,0x9c9552,0x7a7840]:[0x4f8f3a,0x5fa042,0x3f7a2e],hl=k==1?0xb3a860:0x7bbf55;
+ if(k==1){for(let i=0;i<14;i++){const a=r()*6.28,h=.5+r()*.6,d=r()*.45;L.push(cvb(.07,h,.07,Math.cos(a)*d,h/2+.1,Math.sin(a)*d,i%2?0x7a5a3a:0x8d6e47,a,.2));L.push(cvb(.07,.3,.07,Math.cos(a)*(d+.15),h+.15,Math.sin(a)*(d+.15),0x6d4c2e,a,.2))}for(let i=0;i<7;i++){const a=r()*6.28,d=r()*.5;L.push(cvb(.28,.2,.28,Math.cos(a)*d,.3+r()*.5,Math.sin(a)*d,G[i%3],r()*3,.12))}}
+ else{L.push(cvb(.9,.5,.9,0,.3,0,G[2]));[[.45,.1],[-.4,.2],[.1,-.45],[-.2,.4]].forEach((a,i)=>L.push(cvb(.55+r()*.15,.45,.55,a[0],.28,a[1],G[i%3],r()*3,.12)));L.push(cvb(.75,.4,.75,0,.7,0,G[1]));L.push(cvb(.5,.3,.5,.1,1.0,-.05,hl,.5));
+  if(k==2){const fc=[0xe86a9a,0xf5d04a,0xffffff,0xd9467a];for(let i=0;i<9;i++){const a=r()*6.28,d=.25+r()*.45,y=.4+r()*.7;L.push(cvb(.13,.13,.13,Math.cos(a)*d,y,Math.sin(a)*d,fc[i%4],0,.05))}}}
+ return BGc["b"+k]=mergeC(L)}
+/* --- rumput liar (tuft), kering atau subur --- */
+function tuftGeo(lush){const key="t"+(lush?1:0);if(BGc[key])return BGc[key];const r=rng(808),L=[],C=lush?[0x5aa23c,0x6db84a,0x4a8f33,0x7bc455]:[0xa3a24a,0xc2b45a,0x8f9a45,0xb5a850];
+ for(let i=0;i<6;i++){const a=r()*6.28,d=r()*.28,h=.35+r()*.5,x=Math.cos(a)*d,z=Math.sin(a)*d,lean=(r()-.5)*.14;L.push(cvb(.07,h*.6,.07,x,h*.3,z,C[i%4],0,.12));L.push(cvb(.065,h*.5,.065,x+lean,h*.6+h*.2,z,C[(i+1)%4],0,.12))}
+ return BGc[key]=mergeC(L)}
+/* --- kaktus: saguaro berlengan / bulat berbunga --- */
+function cactusGeo(k){if(BGc["c"+k])return BGc["c"+k];const L=[],G=[0x4a8b45,0x3d7a3d,0x5a9a50],r=rng(70+k);
+ if(k==0){L.push(cvb(.6,2.8,.6,0,1.4,0,G[0]));[-.18,.18].forEach(x=>L.push(cvb(.07,2.6,.64,x,1.4,0,G[1],0,.02)));L.push(cvb(.46,.2,.46,0,2.85,0,G[2]));
+  L.push(cvb(.65,.34,.34,.5,1.3,0,G[0]));L.push(cvb(.34,.95,.34,.82,1.78,0,G[0]));L.push(cvb(.26,.15,.26,.82,2.3,0,G[2]));
+  L.push(cvb(.6,.32,.32,-.46,1.8,0,G[0]));L.push(cvb(.32,.8,.32,-.76,2.2,0,G[0]));L.push(cvb(.26,.15,.26,-.76,2.65,0,G[2]));L.push(cvb(.22,.14,.22,0,3.0,0,0xe86a9a));
+  for(let i=0;i<12;i++)L.push(cvb(.03,.1,.03,(r()-.5)*.55,.4+r()*2.2,(r()<.5?.31:-.31),0xe9e2c0))}
+ else{L.push(cvb(.95,.4,.95,0,.22,0,G[1]));L.push(cvb(.85,.4,.85,0,.6,0,G[0]));L.push(cvb(.7,.3,.7,0,.95,0,G[2]));[-.2,.2].forEach(x=>L.push(cvb(.07,.9,.98,x,.55,0,G[1],0,.02)));L.push(cvb(.3,.15,.3,0,1.17,0,0xf5d04a));
+  for(let i=0;i<10;i++){const a=r()*6.28;L.push(cvb(.04,.1,.04,Math.cos(a)*.48,.2+r()*.7,Math.sin(a)*.48,0xe9e2c0))}}
+ return BGc["c"+k]=mergeC(L)}
+function crescentG(){if(BGc.cr)return BGc.cr;const L=[],g=0xd4a017;for(let i=0;i<9;i++){const a=(55+i*31)*Math.PI/180;L.push(cvb(.17,.17,.14,Math.cos(a)*.55,.55+Math.sin(a)*.55,0,g,0,.04))}L.push(cvb(.14,.14,.12,.12,.55,0,0xf1c94a));return BGc.cr=mergeC(L)}
+
+/* --- papan nama / balon teks: dipakai juga oleh dunia --- */
+
+/* ===== KARAKTER VOXEL (kepala kubus 8x8x8, badan 8x12x4, tangan 4x12x4, kaki 4x12x4 — skala Minecraft) ===== */
+function atlasBox(w,h,d,R,AW,AH){const g=new _BG(w,h,d),uv=g.attributes.uv;for(let f=0;f<6;f++){const r=R[f],u0=r[0]/AW,u1=(r[0]+r[2])/AW,v0=1-r[1]/AH,v1=1-(r[1]+r[3])/AH;uv.setXY(f*4,u0,v0);uv.setXY(f*4+1,u1,v0);uv.setXY(f*4+2,u0,v1);uv.setXY(f*4+3,u1,v1)}return g}
+// urutan sisi BoxGeometry: +x,-x,+y,-y,+z(depan),-z(belakang)
+const mcRects=(uw,uh,ud,ox,oy)=>[[ox+ud+uw,oy+ud,ud,uh],[ox,oy+ud,ud,uh],[ox+ud,oy,uw,ud],[ox+ud+uw,oy,uw,ud],[ox+ud,oy+ud,uw,uh],[ox+2*ud+uw,oy+ud,uw,uh]];
+const patchRects=(x,y,s)=>[0,1,2,3,4,5].map(()=>[x,y,s,s]);
+const HAIRC=[0x16130f,0x2b1a10,0x3d2616,0x5a3a1e,0x7a4f26,0x241c17],GREYC=[0xd8d8d8,0xb9b9b9,0xe8e4dc],IRISC=[0x2b1a10,0x3b2a14,0x1f4e79,0x2e6b34,0x5d4037,0x37474f],SHOEC=[0x3e2723,0x212121,0x5d4037,0x4e342e,0x37474f],ACCC=[0xd4a017,0xf5f0e1,0x3e2723,0x00897b,0xb71c1c,0x1a237e];
+function charCanvas(o){
+ const nm=o.n||"",sd=hsh(nm+"|"+o.r+"|"+o.h+"|"+o.s+(o.hero?"H":"")),r=rng(sd),kid=(o.k||1)<.9,fem=!!o.f,
+  elder=/Tetua|Syekh|Ustaz|Juragan/.test(nm),work=/Pandai Besi|Pengrajin|Pemahat|Pengangkut|Petani|Peternak|Pembawa|Tukang/.test(nm),
+  cv=mkCanvas(64,64),x=cv.getContext("2d"),pp=painter(x,r),
+  skin=o.s,skD=mix(skin,0,.2),rob=o.r,robD=mix(rob,0,.28),robL=mix(rob,0xffffff,.3),
+  hair=o.hero?0x5a3a1e:elder?GREYC[sd%3]:HAIRC[sd%6],iris=o.hero?0x1f6fb5:IRISC[(sd>>>3)%6],shoe=SHOEC[(sd>>>5)%5];
+ let acc=ACCC[(sd>>>9)%6];for(let i=0;i<6&&cdist(acc,rob)<150;i++)acc=ACCC[((sd>>>9)+i+1)%6];if(o.hero)acc=0xd4a017;
+ const st=work?3:(sd>>>2)%3,gold=0xd4a017,leather=0x5d4037;
+ // jenis penutup kepala
+ let hw;if(fem)hw="hijab";else if(o.hero)hw="shem";else if(o.wk)hw="peci";else{const lt=rgbOf(o.h);hw=(lt[0]>225&&lt[1]>225&&lt[2]>195)?"ghutra":(((sd>>>7)%5<3)?"turban":"peci")}
+ // ---- KEPALA ----
+ pp(8,0,8,8,hair,.1);pp(16,0,8,8,skin,.05);pp(8,8,8,8,skin,.05);
+ const bang=(sd>>>11)%3;pp(8,8,8,1,hair,.1);if(bang==2)pp(8,9,8,1,hair,.1);else if(bang==1){pp(8,9,3,1,hair,.1);pp(13,9,3,1,hair,.1)}
+ pp(8,9,1,2,hair,.1);pp(15,9,1,2,hair,.1);if(fem){pp(8,9,1,6,hair,.1);pp(15,9,1,6,hair,.1)}
+ if(kid){pp(9,12,2,2,0xffffff,.02);pp(13,12,2,2,0xffffff,.02);pp(10,12,1,2,iris,.03);pp(13,12,1,2,iris,.03)}
+ else{pp(9,12,1,1,0xffffff,.02);pp(10,12,1,1,iris,.03);pp(13,12,1,1,iris,.03);pp(14,12,1,1,0xffffff,.02);
+  pp(9,11,2,1,fem?mix(hair,skin,.35):hair,.05);pp(13,11,2,1,fem?mix(hair,skin,.35):hair,.05);
+  if(fem){pp(9,11,1,1,0x1b1b1b,0);pp(14,11,1,1,0x1b1b1b,0)}else if((sd>>>13)%3==0){pp(9,10,2,1,hair,.05);pp(13,10,2,1,hair,.05)}}
+ const bs=(fem||kid)?"none":elder?"full":["none","stub","must","goat","full","stub"][(sd>>>15)%6];
+ if(bs=="full"){pp(8,13,8,3,hair,.1);pp(8,12,1,1,hair,.1);pp(15,12,1,1,hair,.1)}
+ else if(bs=="stub"){for(let i=0;i<16;i++)pp(8+(r()*8|0),13+(r()*3|0),1,1,mix(skin,hair,.5),.04)}
+ else{pp(11,13,2,1,mix(skin,0,.16),.03);if(bs=="must"||bs=="goat")pp(10,13,4,1,hair,.06);if(bs=="goat")pp(11,15,2,1,hair,.06)}
+ const mc=fem?0xb23a5a:mix(skin,0x7a2f2f,.55);pp(11,14,2,1,mc,.03);
+ if(((sd>>>17)&1)&&!kid){pp(10,14,1,1,mix(skin,mc,.3),0);pp(13,14,1,1,mix(skin,mc,.3),0)}
+ if(kid||fem){pp(9,13,1,1,mix(skin,0xff8a8a,.3),0);pp(14,13,1,1,mix(skin,0xff8a8a,.3),0)}
+ if(/Guru/.test(nm)){[[9,11,2],[13,11,2],[9,13,2],[13,13,2],[8,12,1],[11,12,2],[15,12,1]].forEach(a=>pp(a[0],a[1],a[2],1,0x222222,0))}
+ if(((sd>>>19)&3)==0&&bs=="none"&&!kid){for(let i=0;i<5;i++)pp(9+(r()*6|0),13,1,1,mix(skin,0xa0522d,.35),0)}
+ if(/Pandai Besi/.test(nm))for(let i=0;i<14;i++)pp(8+(r()*8|0),9+(r()*6|0),1,1,0x3a3a3a,.1);
+ if(/Pemahat|Pengangkut/.test(nm))for(let i=0;i<10;i++)pp(8+(r()*8|0),9+(r()*6|0),1,1,0xcfc8bb,.1);
+ [[0,0],[16,1]].forEach(a=>{const X=a[0],L=a[1];pp(X,8,8,8,skin,.05);pp(X,8,8,3,hair,.1);pp(L?X+4:X,11,4,fem?5:3,hair,.1);pp(X+3,12,2,2,skD,.05);if(bs=="full")pp(L?X:X+7,11,1,4,hair,.1)});
+ pp(24,8,8,8,skin,.05);pp(24,8,8,fem?8:5,hair,.1);
+ // ---- LAPISAN KEPALA (jilbab / sorban / ghutra / peci), piksel transparan = wajah terlihat ----
+ const C=o.h,cloth=(X,Y,w,h,c,c2)=>{for(let j=0;j<h;j++)for(let i=0;i<w;i++)pp(X+i,Y+j,1,1,(i+j)%2?(c2!=null?c2:mix(c,0,.05)):c,.04)};
+ if(hw=="hijab"){[[40,0],[48,0],[32,8],[40,8],[48,8],[56,8]].forEach(a=>cloth(a[0],a[1],8,8,C));x.clearRect(41,10,6,5);pp(41,9,6,1,mix(C,0,.2),.03)}
+ else if(hw=="ghutra"||hw=="shem"){const base=o.hero?0xf5f0e1:C,c2=o.hero?0xd32f2f:null,ag=0x1b1b1b;
+  cloth(40,0,8,8,base,c2);cloth(40,8,8,3,base,c2);pp(40,9,8,1,ag,.03);cloth(40,11,2,5,base,c2);cloth(46,11,2,5,base,c2);
+  cloth(32,8,8,3,base,c2);pp(32,9,8,1,ag,.03);cloth(32,11,6,5,base,c2);cloth(48,8,8,3,base,c2);pp(48,9,8,1,ag,.03);cloth(50,11,6,5,base,c2);
+  cloth(56,8,8,8,base,c2);pp(56,9,8,1,ag,.03)}
+ else if(hw=="turban"){const band=(X,Y,w,h)=>{for(let j=0;j<h;j++)for(let i=0;i<w;i++)pp(X+i,Y+j,1,1,((i+j)%4<2)?C:mix(C,0,.18),.04)};band(40,0,8,8);band(40,8,8,3);band(32,8,8,3);band(48,8,8,3);band(56,8,8,3)}
+ else{[[40,0,8],[40,8,2],[32,8,2],[48,8,2],[56,8,2]].forEach(a=>{pp(a[0],a[1],8,a[2],C,.06)});[[40,9],[32,9],[48,9],[56,9]].forEach(a=>pp(a[0],a[1],8,1,mix(C,0,.25),.04))}
+ // petak bahan untuk benda tambahan (sorban, jilbab, alat, topi jerami, ransel)
+ [[0,32,C],[0,48,0x6d4c3b],[16,48,0x607d8b],[32,48,0xd9b44a],[48,48,0x5d4037]].forEach(e=>pp(e[0],e[1],16,16,e[2],.08));
+ // ---- BADAN ----
+ pp(16,20,24,12,rob,.06);pp(20,16,8,4,rob,.06);pp(28,16,8,4,robD,.06);
+ if(fem){pp(23,20,2,1,skin,.03);[[20,8],[16,4],[28,4],[32,8]].forEach(a=>{pp(a[0],24,a[1],1,acc,.05);pp(a[0],31,a[1],1,acc,.05)});for(let i=0;i<9;i++)pp(20+(r()*8|0),26+(r()*5|0),1,1,mix(rob,0xffffff,.55),0)}
+ else if(st==0){pp(23,20,2,2,skin,.03);pp(23,22,2,7,robL,.04);[23,25,27].forEach(y=>pp(23,y,1,1,0xffffff,0));[[20,8],[16,4],[28,4],[32,8]].forEach(a=>{pp(a[0],28,a[1],2,acc,.05);pp(a[0],31,a[1],1,acc,.05)});pp(23,28,2,2,0xffd54f,0)}
+ else if(st==1){pp(22,20,4,12,0xf3ead2,.05);pp(20,20,2,12,robD,.06);pp(26,20,2,12,robD,.06);pp(22,20,1,12,gold,.04);pp(25,20,1,12,gold,.04);[23,26,29].forEach(y=>pp(23,y,2,1,acc,0));pp(32,20,8,12,robD,.06)}
+ else if(st==2){pp(23,20,2,1,skin,.03);[[20,8],[16,4],[28,4],[32,8]].forEach(a=>{pp(a[0],21,a[1],1,acc,.04);pp(a[0],30,a[1],1,acc,.04)});pp(23,24,2,2,acc,0);pp(23,27,2,2,acc,0)}
+ else{pp(23,20,2,1,skin,.03);pp(21,23,6,9,leather,.06);pp(22,20,1,3,leather,.06);pp(25,20,1,3,leather,.06);pp(23,27,2,2,mix(leather,0,.25),.05)}
+ if(o.hero)[[16,4],[20,8],[28,4],[32,8]].forEach(a=>pp(a[0],20,a[1],2,0xd32f2f,.05));
+ // ---- TANGAN ----
+ const sl=work?3:9;pp(40,20,16,12,skin,.05);pp(40,20,16,sl,rob,.06);if(!work)pp(40,20+sl-1,16,1,acc,.05);pp(44,16,4,4,rob,.06);pp(48,16,4,4,skin,.05);
+ // ---- KAKI ----
+ const pants=((work||(sd&1))&&!fem)?mix(rob,0x1a1a1a,.5):rob;pp(0,20,16,12,pants,.06);if(!work&&!fem&&pants==rob)pp(0,28,16,1,acc,.05);
+ pp(0,fem?31:30,16,fem?1:2,shoe,.05);pp(4,16,4,4,pants,.06);pp(8,16,4,4,shoe,.05);
+ return{cv,hw}}
+
+// person(o): o.r=jubah, o.h=penutup kepala, o.s=kulit, o.f=perempuan, o.k=skala, o.n=nama (benih keunikan wajah/rambut/pakaian)
+function person(o){
+ const g=new T.Group(),k=o.k||1,U=PXU,cc=charCanvas(o),tex=pxTex(cc.cv,0),hw=cc.hw,
+  mat=new T.MeshLambertMaterial({map:tex}),matO=new T.MeshLambertMaterial({map:tex,alphaTest:.5}),
+  part=(w,h,d,R,m)=>new T.Mesh(atlasBox(w,h,d,R,64,64),m||mat),nm=o.n||"",
+  patch=(w,h,d,x,y,z,px,py,par)=>{const m=part(w,h,d,patchRects(px,py,16));m.position.set(x,y,z);par.add(m);return m};
+ const rig=new T.Group();g.add(rig);g.rig=rig;if(o.sit)rig.position.y=-.6;
+ // kaki (pivot di pinggul)
+ [-1,1].forEach(s=>{const p=new T.Group();p.position.set(s*2*U,12*U,0);rig.add(p);const m=part(4*U,12*U,4*U,mcRects(4,12,4,0,16));m.position.y=-6*U;p.add(m);if(s<0)g.lL=p;else g.lR=p});
+ // torso (bisa condong saat berlari / membungkuk)
+ const tr=new T.Group();tr.position.y=12*U;rig.add(tr);g.tr=tr;
+ const body=part(8*U,12*U,4*U,mcRects(8,12,4,16,16));body.position.y=6*U;tr.add(body);
+ // kepala (bisa menoleh)
+ const hd=new T.Group();hd.position.y=12*U;tr.add(hd);g.hd=hd;
+ const head=part(8*U,8*U,8*U,mcRects(8,8,8,0,0));head.position.y=4*U;hd.add(head);
+ const hs=hw=="peci"?1.07:hw=="hijab"?1.17:1.14,ho=part(8*U*hs,8*U*(hw=="peci"?1.05:1.1),8*U*hs,mcRects(8,8,8,32,0),matO);ho.position.y=4*U+.012;hd.add(ho);
+ if(hw=="turban")patch(.46,.13,.46,0,8*U+.06,0,0,32,hd);
+ if(hw=="hijab")patch(.68,.34,.4,0,-.05,0,0,32,tr).position.y=12*U-.05;
+ if(/Petani/.test(nm)){patch(.62,.15,.62,0,8*U+.1,0,32,48,hd);patch(1.02,.04,1.02,0,8*U+.03,0,32,48,hd)}
+ // tangan (pivot di bahu)
+ [-1,1].forEach(s=>{const a=new T.Group();a.position.set(s*6*U,10*U,0);tr.add(a);const m=part(4*U,12*U,4*U,mcRects(4,12,4,40,16));m.position.y=-4*U;a.add(m);if(s<0)g.aL=a;else g.aR=a});
+ if(o.act=="hammer"){patch(.07,.07,.5,0,-.66,.2,0,48,g.aR);patch(.32,.15,.15,0,-.66,.45,16,48,g.aR)}
+ if(/Gembala/.test(nm)){patch(.06,1.7,.06,0,-.5,.1,0,48,g.aR);patch(.22,.06,.06,.08,.37,.1,0,48,g.aR)}
+ if(/Pembawa Air/.test(nm)){patch(.26,.22,.26,0,-.76,.14,0,48,g.aL);patch(.2,.04,.04,0,-.62,.14,16,48,g.aL)}
+ if(o.hero)patch(.42,.5,.2,0,.46,-.23,48,48,tr);
+ if(o.sit){g.lL.rotation.x=g.lR.rotation.x=-1.45}
+ g.scale.setScalar(k);return g}
+
+/* ===== HEWAN VOXEL (unta & domba) dengan kaki yang berayun saat bergerak ===== */
+const ANI=[];let camelN=0,sheepN=0;
+const CAM={},SHP={};
+function camelMat(v){if(CAM[v])return CAM[v];const tones=[0xc19a6b,0xa9805a,0xd8b98a],tone=tones[v%3],bl=[0xb71c1c,0x1565c0,0x2e7d32][(v/3|0)%3],cv=mkCanvas(32,16),x=cv.getContext("2d"),r=rng(v*977+13),pp=painter(x,r);
+ pp(0,0,8,8,mix(tone,0xffffff,.1),.06);pp(1,3,2,1,0x1b1b1b,0);pp(5,3,2,1,0x1b1b1b,0);pp(1,2,2,1,mix(tone,0,.35),0);pp(5,2,2,1,mix(tone,0,.35),0);pp(3,5,2,1,0x3e2723,0);pp(2,7,4,1,mix(tone,0,.3),0);
+ pp(8,0,8,8,tone,.09);for(let i=0;i<6;i++)pp(8+(r()*8|0),(r()*8|0),1,1,mix(tone,0,.25),.04);
+ pp(16,0,8,8,mix(tone,0x3e2723,.22),.07);pp(16,7,8,1,0x3e2723,.05);pp(16,3,8,1,mix(tone,0x3e2723,.4),.05);
+ pp(0,8,8,8,bl,.06);pp(0,8,8,1,0xd4a017,.04);pp(0,15,8,1,0xd4a017,.04);for(let i=0;i<8;i+=2)pp(i,11,1,2,0xd4a017,.04);
+ return CAM[v]={mat:new T.MeshLambertMaterial({map:pxTex(cv,0)})}}
+function camel(x,z,ry){const g=new T.Group();g.position.set(x,0,z);g.rotation.y=ry;scene.add(g);
+ const m=camelMat(camelN++%9).mat,R=(px,py)=>patchRects(px,py,8),
+  add=(w,h,d,px,py,X,Y,Z,rr)=>{const b=new T.Mesh(atlasBox(w,h,d,rr||R(px,py),32,16),m);b.position.set(X,Y,Z);g.add(b);return b};
+ add(2.5,.95,.95,8,0,0,1.75,0);add(.8,.6,.7,8,0,-.25,2.52,0);add(1.0,1.0,1.02,0,8,.55,1.75,0);
+ add(.46,.85,.5,8,0,1.2,2.2,0);add(.46,.85,.5,8,0,1.42,2.9,0);
+ const fr=R(8,0);fr[0]=[0,0,8,8];add(.95,.46,.46,8,0,1.9,3.32,0,fr);
+ add(.1,.2,.12,8,0,1.55,3.66,.2);add(.1,.2,.12,8,0,1.55,3.66,-.2);add(.12,.75,.14,16,0,-1.3,1.85,0);
+ const L=[];[[.9,.3,1],[.9,-.3,-1],[-.9,.3,-1],[-.9,-.3,1]].forEach(a=>{const p=new T.Group();p.position.set(a[0],1.275,a[1]);g.add(p);const lm=new T.Mesh(atlasBox(.3,1.275,.3,R(16,0),32,16),m);lm.position.y=-.6375;p.add(lm);L.push([p,a[2]])});
+ ANI.push({g,L,ph:rnd(0,6),sm:0});col.push({x:x+.4*Math.cos(ry),z:z-.4*Math.sin(ry),w:3.8,d:1.2,ry});return g}
+function sheepMat(v){if(SHP[v])return SHP[v];const wool=[0xf4efe4,0xede4d0,0xf4efe4,0xe9e2d4,0x3b3b3b,0x8d6e4a][v%6],face=v%6==4?0x2a2a2a:[0x6b6b6b,0x5a4a3a][v&1],cv=mkCanvas(32,16),x=cv.getContext("2d"),r=rng(v*131+9),pp=painter(x,r);
+ pp(0,0,8,8,wool,.1);for(let i=0;i<14;i++)pp((r()*8|0),(r()*8|0),1,1,mix(wool,v%6==4?0xffffff:0,.2),0);
+ pp(8,0,8,8,face,.06);pp(9,3,2,1,0xffffff,0);pp(13,3,2,1,0xffffff,0);pp(10,3,1,1,0x111111,0);pp(13,3,1,1,0x111111,0);pp(11,5,2,1,mix(face,0xffb6b6,.5),0);pp(10,7,4,1,mix(face,0,.4),0);
+ pp(16,0,8,8,face,.06);pp(24,0,8,8,mix(face,0,.15),.06);
+ return SHP[v]={mat:new T.MeshLambertMaterial({map:pxTex(cv,0)})}}
+function sheep(x,z){const g=new T.Group();g.position.set(x,0,z);scene.add(g);
+ const m=sheepMat(sheepN++%12).mat,R=(px,py)=>patchRects(px,py,8),add=(w,h,d,px,py,X,Y,Z,rr)=>{const b=new T.Mesh(atlasBox(w,h,d,rr||R(px,py),32,16),m);b.position.set(X,Y,Z);g.add(b);return b};
+ add(1.0,.7,.75,0,0,0,.8,0);add(.46,.14,.46,0,0,.68,1.2,0);add(.2,.2,.2,0,0,-.58,.85,0);
+ const fr=R(16,0);fr[0]=[8,0,8,8];add(.4,.4,.4,16,0,.7,.92,0,fr);add(.1,.12,.18,16,0,.62,1.04,.26);add(.1,.12,.18,16,0,.62,1.04,-.26);
+ const L=[];[[.3,.2,1],[.3,-.2,-1],[-.3,.2,-1],[-.3,-.2,1]].forEach(a=>{const p=new T.Group();p.position.set(a[0],.45,a[1]);g.add(p);const lm=new T.Mesh(atlasBox(.16,.45,.16,R(24,0),32,16),m);lm.position.y=-.225;p.add(lm);L.push([p,a[2]])});
+ ANI.push({g,L,ph:rnd(0,6),sm:0});return g}
+function animTick(dt){for(let i=ANI.length-1;i>=0;i--){const a=ANI[i];if(!a.g.parent){ANI.splice(i,1);continue}const p=a.g.position;if(a.lx==null){a.lx=p.x;a.lz=p.z;continue}
+ const sp=Math.hypot(p.x-a.lx,p.z-a.lz)/Math.max(dt,.001);a.lx=p.x;a.lz=p.z;a.ph+=dt*(3+Math.min(sp,6)*1.3);a.sm+=(Math.min(.75,sp*.3)-a.sm)*Math.min(1,dt*8);const s=Math.sin(a.ph)*a.sm;a.L.forEach(l=>{l[0].rotation.z=s*l[1]})}}
+// animasi pemain: jalan, lari, lompat, berinteraksi (melambai saat bicara dengan NPC)
+let avPh=0;
+function animAv(dt){const g=av;if(!g.visible)return;const mv=P.mv&&!UI,run=mv&&(keys.ShiftLeft||keys.ShiftRight||Math.hypot(jv.x,jv.y)>1.05),k=Math.min(1,dt*14);
+ if(UI&&P.ia>0)P.ia=1;else P.ia=Math.max(0,(P.ia||0)-dt);
+ const talk=!mv&&P.y==0&&P.ia>0;let aL=0,aR=0,lL=0,lR=0,tr=0,hy=0;
+ if(P.y>.001){lL=-.7;lR=.5;aL=-2.6;aR=-2.6;tr=.08}
+ else if(mv){avPh+=dt*(run?16:10);const s=Math.sin(avPh)*(run?1.05:.65);lL=-s;lR=s;aL=s*(run?1.15:.9);aR=-s*(run?1.15:.9);tr=run?.3:.05}
+ else if(talk){aR=-2.7+Math.sin(tt*9)*.35;hy=Math.sin(tt*2.5)*.18}
+ else{aL=Math.sin(tt*1.7)*.05;aR=-aL}
+ const f=(o,v)=>{o.rotation.x+=(v-o.rotation.x)*k};f(g.lL,lL);f(g.lR,lR);f(g.aL,aL);f(g.aR,aR);f(g.tr,tr);g.hd.rotation.y+=(hy-g.hd.rotation.y)*k}
+
+const GC={};
+const G=(k,f)=>GC[k]||(GC[k]=f()),bxg=(w,h,d)=>G("b"+w+h+d,()=>boxUVs(new T.BoxGeometry(w,h,d),w,h,d)),cyg=(a,b,h,s)=>G("c"+a+b+h+s,()=>new T.CylinderGeometry(a,b,h,s)),spg=(r)=>G("s"+r,()=>new T.SphereGeometry(r,10,8));
+function mk(g,c,x,y,z,p){const m=new T.Mesh(g,typeof c=="number"?M(c):c);m.position.set(x,y,z);(p||scene).add(m);return m}
+const bx=(w,h,d,c,x,y,z,p)=>mk(bxg(w,h,d),c,x,y,z,p),col=[];
+const BX=140;
+// tanah berpasir
+{const c=mkCanvas(32,32),g=c.getContext("2d"),r=rng(4242);for(let j=0;j<32;j++)for(let i=0;i<32;i++){const rp=Math.sin(6.2832*(2*i+j)/32),q=r();let v=.97+rp*.035+(q-.5)*.07;if(q<.04)v*=.9;else if(q>.965)v*=1.07;g.fillStyle=css(0xe2bd7a,v);g.fillRect(i,j,1,1)}
+const t=pxTex(c,1);t.repeat.set(360,360);t.anisotropy=4;
+const gr=new T.Mesh(new T.PlaneGeometry(720,720),new T.MeshLambertMaterial({map:t}));gr.rotation.x=-Math.PI/2;scene.add(gr)}
+const dummy=new T.Object3D();
+function inst(g,mat,list){const im=new T.InstancedMesh(g,mat,list.length);list.forEach((l,i)=>{dummy.position.set(l[0],l[1],l[2]);dummy.scale.set(l[3],l[4],l[5]);dummy.rotation.set(0,l[6]||0,0);dummy.updateMatrix();im.setMatrixAt(i,dummy.matrix)});im.frustumCulled=false;scene.add(im);return im}
+
+/* ===== PROPS DETAIL: api unggun & bara, tenda Badui, ladang gandum, lahan sayur, oase, jerami ===== */
+const FIRES=[],TG={},SGc={};
+function fire(x,z,s,nc){s=s||1;const g=new T.Group();g.position.set(x,0,z);g.scale.setScalar(s);scene.add(g);
+ const r=rng(Math.abs((x*31+z*17)|0)+3),st=[0x8a8478,0x9a9486,0x7a746a,0xa39d8f],L=[];
+ for(let i=0;i<10;i++){const a=i/10*6.2832,rr=1.0+(r()-.5)*.1;L.push(cvb(.4+r()*.14,.28+r()*.12,.32+r()*.1,Math.cos(a)*rr,.15,-Math.sin(a)*rr,st[i%4],a,.12))}
+ for(let i=0;i<7;i++){const a=i/7*6.2832+.3;L.push(cvb(.22,.14,.2,Math.cos(a),.38,-Math.sin(a),st[(i+2)%4],a,.1))}
+ L.push(cvb(1.7,.04,1.7,0,.03,0,0x2b2622,.4));L.push(cvb(1.1,.04,1.1,0,.06,0,0x3d342d,.7));
+ L.push(cvb(1.55,.17,.22,0,.2,0,0x5d4037,.6));L.push(cvb(1.55,.17,.22,0,.2,0,0x6d4c41,-.6));L.push(cvb(1.3,.17,.2,0,.37,0,0x4e342e,1.1));L.push(cvb(.28,.18,.24,.8,.2,.5,0x1c1714,.3));L.push(cvb(.26,.16,.22,-.7,.2,-.5,0x1c1714,.2));
+ g.add(new T.Mesh(mergeC(L),MC));
+ const co=[];for(let i=0;i<8;i++){const a=r()*6.28,d=.12+r()*.55,m=new T.Mesh(bxg(.2+r()*.1,.12,.2+r()*.1),new T.MeshBasicMaterial({color:0xff5a1a}));m.position.set(Math.cos(a)*d,.14+r()*.1,Math.sin(a)*d);m.rotation.y=r()*3;g.add(m);co.push({m,ph:r()*6})}
+ const fl=[];[[0,0,.62,1.7,0],[.32,.12,.45,1.25,1.7],[-.3,-.14,.46,1.35,3.1],[.05,-.34,.38,1.0,4.4]].forEach(a=>{[[1,0xff4a14],[.7,0xff9a1f],[.4,0xffe066]].forEach((q,k)=>{const h=a[3]*q[0],m=new T.Mesh(new T.ConeGeometry(a[2]*q[0],h,4),new T.MeshBasicMaterial({color:q[1]}));g.add(m);fl.push({m,h,x:a[0],z:a[1],ph:a[4]+k*.25,y0:.28})})});
+ const sp=[],sm=[],sparkM=new T.MeshBasicMaterial({color:0xffb347}),smokeM=new T.MeshBasicMaterial({color:0x6f6a64,transparent:true,opacity:.22,depthWrite:false});
+ for(let i=0;i<10;i++){const m=new T.Mesh(bxg(.08,.08,.08),sparkM);g.add(m);sp.push({m,ph:r()*6,sp:.5+r()*.5,ax:r()*6})}
+ for(let i=0;i<4;i++){const m=new T.Mesh(bxg(.5,.5,.5),smokeM);g.add(m);sm.push({m,ph:i*.6,ax:r()*6})}
+ const gl=new T.Mesh(bxg(4.6,.02,4.6),new T.MeshBasicMaterial({color:0xff9a3c,transparent:true,opacity:.2,depthWrite:false}));gl.position.y=.05;g.add(gl);
+ FIRES.push(t=>{fl.forEach(f=>{const q=1+.22*Math.sin(t*9+f.ph)+.1*Math.sin(t*17+f.ph*2),w=1+.1*Math.cos(t*7+f.ph);f.m.scale.set(w,q,w);f.m.position.set(f.x+Math.sin(t*5+f.ph)*.05,f.y0+f.h*q/2,f.z);f.m.rotation.y=Math.sin(t*3+f.ph)*.3});
+  co.forEach(c=>{const k=.5+.5*Math.sin(t*6+c.ph);c.m.material.color.setRGB(1,.25+.45*k,.06+.1*k)});
+  sp.forEach(p=>{const u=((t*p.sp+p.ph)%1.6);p.m.position.set(Math.sin(p.ax+u*3)*.35*u,.8+u*1.3,Math.cos(p.ax+u*2)*.35*u);p.m.scale.setScalar(Math.max(.05,1-u/1.6))});
+  sm.forEach(p=>{const u=((t*.28+p.ph)%2.4);p.m.position.set(Math.sin(p.ax+u)*.4,1.9+u*1.2,Math.cos(p.ax+u)*.4);p.m.scale.setScalar(.5+u*.7)});gl.material.opacity=.17+.07*Math.sin(t*8)});
+ if(!nc)col.push({x,z,r:1.2*s})}
+/* --- tenda Badui: atap bertingkat belang, dinding kain, tiang, tali, karpet, bantal, peti, poci --- */
+function tentGeo(c){if(TG[c])return TG[c];const L=[],W=6.2,D=4.8,He=1.6,NL=5,wall=mix(c,0x2b1d10,.25),dk=mix(c,0x1d140c,.45),lt=mix(c,0xffffff,.28),wood=0x6d4c41;
+ const rug=[0xa83232,0xe9d6a6,0x2a5a8a,0xe9d6a6,0xa83232];for(let i=0;i<5;i++)L.push(cvb(1.04,.05,3.7,-2.08+i*1.04,.03,.25,rug[i],0,.06));L.push(cvb(5.3,.04,.2,0,.04,2.15,0xd9b24a));L.push(cvb(5.3,.04,.2,0,.04,-1.65,0xd9b24a));
+ L.push(cvb(W,He,.14,0,He/2,-D/2+.1,wall));L.push(cvb(W,.3,.16,0,.15,-D/2+.1,dk));
+ [-1,1].forEach(s=>{L.push(cvb(.14,He,D-.2,s*(W/2-.1),He/2,0,wall));L.push(cvb(.16,.3,D-.2,s*(W/2-.1),.15,0,dk))});
+ for(let i=0;i<NL;i++){const y=He+.16+i*.3,dp=(D+1.1)-i*((D+1.1-.5)/(NL-1)),zc=.3-i*.02;for(let s=0;s<7;s++){const x=-(W+.8)/2+(s+.5)*((W+.8)/7);L.push(cvb((W+.8)/7,.3,dp,x,y,zc,s%2?dk:(s==3?lt:c),0,.07))}}
+ L.push(cvb(W+.9,.14,.55,0,He+.16+NL*.3+.02,.28,dk));
+ [-1,1].forEach(s=>{L.push(cvb(.15,He+1.5,.15,s*(W/2-.35),(He+1.5)/2,D/2-.15,wood));L.push(cvb(.5,1.35,.12,s*(W/2-.12),.8,D/2-.2,wall,s*.6));L.push(cvb(.1,.1,.35,s*(W/2-.35),1.5,D/2-.2,0xd9b24a));
+  for(let k=0;k<3;k++)L.push(cvb(.06,.06,.55,s*(W/2+.3+k*.18),1.35-k*.38,D/2+.25+k*.42,0x8a6d3b,s*.3));L.push(cvb(.1,.34,.1,s*(W/2+.75),.17,D/2+1.55,wood))});
+ L.push(cvb(W-.7,.14,.14,0,He+1.0,D/2-.15,wood));
+ [[-1.9,-1.2,0xb03a48],[-.9,-1.3,0x2e6fb0],[.2,-1.25,0xe0b030]].forEach(a=>{L.push(cvb(.85,.3,.85,a[0],.2,a[1],a[2],.15,.06));L.push(cvb(.6,.1,.6,a[0],.4,a[1],mix(a[2],0xffffff,.3),.15))});
+ L.push(cvb(.95,.55,.6,2.0,.32,-1.2,0x6d4c41));L.push(cvb(1.0,.1,.65,2.0,.62,-1.2,0x5a3d2e));L.push(cvb(.14,.2,.05,2.0,.45,-.88,0xd4a017));
+ L.push(cvb(.28,.3,.28,.9,.19,.4,0xd4a017));L.push(cvb(.16,.2,.16,.9,.43,.4,0xd4a017));L.push(cvb(.28,.05,.1,1.1,.38,.4,0xd4a017));
+ L.push(cvb(.5,.5,.5,-W/2-1.1,.28,-.6,0xb5651d));L.push(cvb(.34,.22,.34,-W/2-1.1,.64,-.6,0xa5561a));L.push(cvb(.42,.07,.42,-W/2-1.1,.78,-.6,0x8a4510));
+ return TG[c]=mergeC(L)}
+/* --- gandum: batang bersendi, bulir bertingkat berduri (matang emas / muda hijau) --- */
+function wheatGeo(k){const key="w"+k;if(BGc[key])return BGc[key];const ripe=k=="ripe",r=rng(ripe?91:92),L=[],S=ripe?[0xcdb25a,0xb89a45,0xd8bf6a]:[0x7fb04a,0x6ea03e,0x8fc058],E=ripe?[0xe2b94a,0xc89a2c,0xedc85c]:[0x9bc653,0x88b445,0xa8d060];
+ for(let i=0;i<4;i++){const a=r()*6.28,d=r()*.2,x=Math.cos(a)*d,z=Math.sin(a)*d,h=(ripe?.95:.55)+r()*(ripe?.35:.25),ln=(r()-.5)*.08;
+  L.push(cvb(.06,h*.55,.06,x,h*.275,z,S[i%3],0,.1));L.push(cvb(.055,h*.5,.055,x+ln,h*.55+h*.25,z,S[(i+1)%3],0,.1));
+  const ty=h*1.05;L.push(cvb(.15,.16,.15,x+ln,ty,z,E[0],0,.08));L.push(cvb(.13,.16,.13,x+ln,ty+.15,z,E[1],0,.08));L.push(cvb(.1,.14,.1,x+ln,ty+.28,z,E[2],0,.08));
+  if(ripe)L.push(cvb(.1,.3,.025,x+ln,ty+.42,z,0xe9d79a,0,.05));
+  if(i<2)L.push(cvb(.05,.32,.14,x+ln*.5,h*.4,z+.07,S[(i+2)%3],r()*.5,.1))}
+ return BGc[key]=mergeC(L)}
+function vegGeo(){if(BGc.v)return BGc.v;const L=[],G=[0x4f9a3a,0x62ab45,0x3f8530];for(let i=0;i<6;i++){const a=i/6*6.28;L.push(cvb(.45,.1,.3,Math.cos(a)*.22,.18+(i%2)*.05,Math.sin(a)*.22,G[i%3],-a,.1))}L.push(cvb(.3,.2,.3,0,.35,0,G[1],.5));
+ [[.4,.15,0xe8681c],[-.35,.25,0xf0b020],[.1,-.42,0xc9302c]].forEach((a,i)=>{L.push(cvb(.26,.22,.26,a[0],.14,a[1],a[2],i,.06));L.push(cvb(.08,.06,.08,a[0],.27,a[1],0x2f6a2a))});return BGc.v=mergeC(L)}
+function scarecrowGeo(){if(BGc.sc)return BGc.sc;const L=[],st=0xe6c767;L.push(cvb(.13,2.3,.13,0,1.15,0,0x6d4c41));L.push(cvb(1.8,.1,.1,0,1.65,0,0x6d4c41));
+ L.push(cvb(.62,.8,.3,0,1.55,0,0x2e6fb0));L.push(cvb(.64,.18,.32,0,1.2,0,0x8a4a24));L.push(cvb(.36,.36,.36,0,2.1,0,0xdcc08a));
+ L.push(cvb(.07,.07,.02,-.09,2.15,.19,0x222222));L.push(cvb(.07,.07,.02,.09,2.15,.19,0x222222));L.push(cvb(.18,.04,.02,0,2.0,.19,0x6b2a1a));
+ L.push(cvb(.8,.06,.8,0,2.34,0,0xd9b24a));L.push(cvb(.4,.22,.4,0,2.48,0,0xe4be52));L.push(cvb(.42,.05,.42,0,2.4,0,0x8a4a24));
+ [-1,1].forEach(s=>{L.push(cvb(.3,.2,.12,s*.98,1.6,0,st));L.push(cvb(.16,.32,.1,s*1.02,1.4,0,st,0,.1));L.push(cvb(.5,.12,.1,s*.55,1.65,0,0x2e6fb0));L.push(cvb(.12,.3,.1,s*.3,1.0,0,st,0,.1))});return BGc.sc=mergeC(L)}
+function wheatField(cx,cz,w,d,mode){const r=rng(Math.abs((cx*7+cz*3)|0)+5);
+ bx(w,.1,d,0x6b4a2b,cx,.05,cz);const rows=Math.floor((d-1.4)/.9);
+ for(let i=0;i<rows;i++){const zz=cz-d/2+1+i*.9;bx(w-.5,.1,.5,0x7a5733,cx,.13,zz);bx(w-.5,.04,.3,0x4b341d,cx,.12,zz+.45)}
+ [-d/2,d/2].forEach(a=>bx(w+.3,.28,.2,0x8d6e3f,cx,.14,cz+a));[-w/2,w/2].forEach(a=>bx(.2,.28,d+.2,0x8d6e3f,cx+a,.14,cz));
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(a=>bx(.3,.55,.3,0x6d4c41,cx+a[0]*(w/2),.28,cz+a[1]*(d/2)));
+ bx(w,.07,.7,0x7a5a3a,cx,.035,cz-d/2-.8);bx(w-.3,.05,.45,0x3fa6d8,cx,.07,cz-d/2-.8);
+ const ripe=[],green=[],veg=[];for(let i=0;i<rows;i++){const zz=cz-d/2+1+i*.9;for(let x=-w/2+.6;x<w/2-.4;x+=.7){const px=cx+x+(r()-.5)*.14,pz=zz+(r()-.5)*.14,q=.85+r()*.35,it=[px,.1,pz,q,q*(.9+r()*.25),q,r()*6.28];if(mode=="ripe")ripe.push(it);else if(x<0)green.push(it);else veg.push(it)}}
+ if(ripe.length)inst(wheatGeo("ripe"),MC,ripe);if(green.length)inst(wheatGeo("green"),MC,green);if(veg.length)inst(vegGeo(),MC,veg);
+ const sx=cx+w/2-1.2,sz=cz+d/2+.9,sc=mk(scarecrowGeo(),MC,sx,.1,sz);sc.rotation.y=-.5;col.push({x:sx,z:sz,r:.5})}
+/* --- oase: alang-alang, bunga teratai, batu tepi, rumput subur, bunga liar --- */
+function reedGeo(){if(BGc.r)return BGc.r;const r=rng(61),L=[],G=[0x5a7a30,0x6c8a38,0x4f6e2a];for(let i=0;i<7;i++){const a=r()*6.28,d=r()*.3,h=1.3+r()*.9,x=Math.cos(a)*d,z=Math.sin(a)*d,ln=(r()-.5)*.2;L.push(cvb(.07,h*.6,.07,x,h*.3,z,G[i%3],0,.12));L.push(cvb(.06,h*.45,.06,x+ln,h*.6+h*.22,z,G[(i+1)%3],0,.12));if(i%2==0){L.push(cvb(.13,.4,.13,x+ln,h*.85+.2,z,0x6b3f1f,0,.1));L.push(cvb(.04,.2,.04,x+ln,h*.85+.5,z,0xc8b27a))}else L.push(cvb(.08,.3,.5,x+ln,h*.9,z+.1,G[i%3],a))}return BGc.r=mergeC(L)}
+function lilyGeo(){if(BGc.l)return BGc.l;const L=[];L.push(cvb(.8,.04,.8,0,0,0,0x4b9a3e,.3,.1));L.push(cvb(.5,.04,.5,.55,0,.3,0x5aa84a,.8,.1));L.push(cvb(.22,.14,.22,.05,.08,.03,0xf0a0c0));L.push(cvb(.1,.1,.1,.05,.18,.03,0xf5d04a));return BGc.l=mergeC(L)}
+function flowerGeo(c){const key="f"+c;if(BGc[key])return BGc[key];const r=rng(c%977),L=[];for(let i=0;i<5;i++){const a=r()*6.28,d=r()*.3,h=.35+r()*.3,x=Math.cos(a)*d,z=Math.sin(a)*d;L.push(cvb(.05,h,.05,x,h/2,z,0x4f9a3a,0,.1));L.push(cvb(.17,.1,.17,x,h+.04,z,c,r()*3,.06));L.push(cvb(.07,.07,.07,x,h+.12,z,0xf5d04a));L.push(cvb(.2,.04,.09,x+.06,h*.4,z,0x5aa84a,a))}return BGc[key]=mergeC(L)}
+function oasisDeco(cx,cz){const RD=[],ST=[],LL=[],TF2=[],FL=[[],[],[],[]];
+ for(let i=0;i<70;i++){const a=rnd(0,6.28),d=rnd(10.6,12.6);RD.push([cx+Math.cos(a)*d,.04,cz+Math.sin(a)*d,rnd(.8,1.25),rnd(.8,1.3),rnd(.8,1.25),rnd(0,6)])}
+ for(let i=0;i<26;i++){const a=i/26*6.28+rnd(-.1,.1),d=rnd(11.3,12.3),q=rnd(.28,.5);ST.push([cx+Math.cos(a)*d,0,cz+Math.sin(a)*d,q,q,q,rnd(0,6)])}
+ for(let i=0;i<9;i++){const a=rnd(0,6.28),d=rnd(1.5,8);LL.push([cx+Math.cos(a)*d,.09,cz+Math.sin(a)*d,rnd(.8,1.3),1,rnd(.8,1.3),rnd(0,6)])}
+ for(let i=0;i<120;i++){const a=rnd(0,6.28),d=rnd(13,23);TF2.push([cx+Math.cos(a)*d,.03,cz+Math.sin(a)*d,rnd(.9,1.4),rnd(1,1.5),rnd(.9,1.4),rnd(0,6)])}
+ for(let i=0;i<60;i++){const a=rnd(0,6.28),d=rnd(13,22);FL[i%4].push([cx+Math.cos(a)*d,.03,cz+Math.sin(a)*d,rnd(.8,1.2),rnd(.8,1.2),rnd(.8,1.2),rnd(0,6)])}
+ inst(reedGeo(),MC,RD);inst(rockGeo(20,0),MC,ST);inst(lilyGeo(),MC,LL);inst(tuftGeo(1),MC,TF2);[0xf5d04a,0xe86a9a,0xffffff,0xe0453a].forEach((c,k)=>inst(flowerGeo(c),MC,FL[k]))}
+/* --- kios pasar: atap belang, keranjang buah, guci, gulungan kain --- */
+function stallGeo(c){if(SGc[c])return SGc[c];const L=[],w=0x8d6e3f,w2=0x7a5c33,cr=0xf1e6c8,dk=mix(c,0x000000,.12);
+ L.push(cvb(3.2,.2,1.3,0,.95,0,w2));[[-1.5,-.5],[1.5,-.5],[-1.5,.5],[1.5,.5]].forEach(a=>L.push(cvb(.18,.9,.18,a[0],.45,a[1],0x6d4c41)));L.push(cvb(3.0,.35,.06,0,.55,.62,w));L.push(cvb(3.0,.35,.06,0,.55,-.62,w2));
+ [-1.55,1.55].forEach(x=>{L.push(cvb(.14,2.7,.14,x,1.35,.95,0x5d4037));L.push(cvb(.14,3.0,.14,x,1.5,-.8,0x5d4037))});
+ for(let i=0;i<4;i++){const y=2.95-i*.13,zc=-.8+(i+.5)*(2.3/4);for(let s=0;s<8;s++)L.push(cvb(3.9/8,.14,2.3/4+.02,-1.95+(s+.5)*(3.9/8),y,zc,s%2?cr:c,0,.06))}
+ L.push(cvb(3.95,.1,.1,0,2.5,1.5,dk));for(let s=0;s<8;s++)L.push(cvb(.3,.22,.05,-1.7+s*.49,2.38,1.52,s%2?cr:c));
+ [[-1.1,0xe8681c],[-.4,0xb3202a],[.3,0x6b3a1e],[1.0,0x8fbf4a]].forEach(a=>{const x=a[0];L.push(cvb(.6,.28,.55,x,1.2,0,0x9c6a2b));L.push(cvb(.66,.06,.6,x,1.36,0,0x7a4f1f));[[-.15,-.12],[.15,-.12],[-.15,.12],[.15,.12]].forEach(p=>L.push(cvb(.2,.2,.2,x+p[0],1.5,p[1],a[1],0,.12)));L.push(cvb(.2,.2,.2,x,1.68,0,a[1],.4,.12))});
+ L.push(cvb(.45,.55,.45,2.0,.28,.6,0xb5651d));L.push(cvb(.3,.2,.3,2.0,.65,.6,0xa5561a));L.push(cvb(.9,.25,.5,-2.0,.13,.5,0x2a5a8a));L.push(cvb(.8,.22,.45,-2.0,.36,.5,0xb03a48));
+ return SGc[c]=mergeC(L)}
+function hayPile(x,z){const L=[],H=[0xe6c767,0xd9b955,0xedd078,0xcfae4a];let n=0;
+ const bale=(bx_,by,bz)=>{L.push(cvb(1.6,.8,1.1,bx_,by,bz,H[n++%4],0,.1));[-.45,.45].forEach(o=>L.push(cvb(.07,.82,1.12,bx_+o,by,bz,0x6b5424,0,.02)))};
+ [-1.7,0,1.7].forEach(a=>bale(a,.4,0));[-.85,.85].forEach(a=>bale(a,1.2,0));bale(0,2.0,0);bale(-.8,.4,1.3);
+ for(let i=0;i<10;i++)L.push(cvb(.5+VR()*.4,.04,.07,(VR()-.5)*5,.03,(VR()-.5)*3+1,H[i%4],VR()*3,.1));
+ L.push(cvb(.08,1.6,.08,2.4,.8,.9,0x6d4c41));L.push(cvb(.3,.08,.06,2.4,1.62,.9,0x777777));[-.12,.12].forEach(o=>L.push(cvb(.05,.2,.05,2.4+o,1.74,.9,0x777777)));
+ mk(mergeC(L),MC,x,0,z)}
+function trough(x,z){const L=[];L.push(cvb(2.4,.12,.9,0,.1,0,0x6b4a2b));L.push(cvb(2.4,.45,.12,0,.35,.4,0x8d6e3f));L.push(cvb(2.4,.45,.12,0,.35,-.4,0x7a5c33));L.push(cvb(.12,.45,.9,-1.14,.35,0,0x6d4c41));L.push(cvb(.12,.45,.9,1.14,.35,0,0x6d4c41));
+ [-1,1].forEach(s=>{L.push(cvb(.16,.3,.16,s*1.0,.15,.35,0x5d4037));L.push(cvb(.16,.3,.16,s*1.0,.15,-.35,0x5d4037))});L.push(cvb(2.1,.1,.64,0,.42,0,0xe6c767,0,.12));L.push(cvb(.5,.08,.3,-.5,.5,0,0xd9b955));L.push(cvb(.4,.08,.3,.6,.5,.05,0xedd078));mk(mergeC(L),MC,x,0,z)}
+// gunung pembatas peta (2 lapis)
+{const G3=[[],[],[]],caps=[],AM=(x,z,r,h,k)=>{G3[k%3].push([x,h/2-2,z,r,h,r,0]);if(h>40)caps.push([x,h*.85-2,z,r*.3,h*.3,r*.3,0]);if(h<60)col.push({x,z,r:r*.85})},ps=(s,t,o)=>s<2?[t,s?o:-o]:[s==2?o:-o,t];
+for(let q=0;q<4;q++)for(let i=0;i<=17;i++){const a=ps(q,-172+i*20.2+rnd(-5,5),166+rnd(-5,5));AM(a[0],a[1],rnd(24,32),rnd(32,58),i+q)}
+for(let q=0;q<4;q++)for(let i=0;i<=10;i++){const a=ps(q,-200+i*40+rnd(-8,8),196+rnd(-6,6));AM(a[0],a[1],rnd(34,44),rnd(60,95),i+q+1)}
+const cg=new T.ConeGeometry(1,1,7);[0xa8845a,0x967550,0xb89464].forEach((c,k)=>inst(cg,M(c),G3[k]));inst(cg,M(0xf1e6d0),caps)}
+// pohon kurma (instanced)
+const palms=[];function palm(x,z,s){palms.push([x,z,s||1])}
+function drawPalms(){const PG=palmGeos();inst(PG.t,MC,palms.map((p,i)=>[p[0],0,p[1],p[2],p[2],p[2],(i%4)*1.5708]));
+inst(PG.l,MC,palms.map((p,i)=>[p[0],0,p[1],p[2],p[2],p[2],(i%4)*1.5708]));
+palms.forEach(p=>col.push({x:p[0],z:p[1],r:.7}))}
+function house(x,z,w,d,h,c,ry){const L=[],tr=mix(c,0x8a6b3a,.4),pl=mix(c,0xb89a60,.5),dk=0x5d4037,wood=0x6d4c41,gl=0x4fc3f7;
+ L.push(cvb(w,h,d,0,h/2,0,c,0,.05));L.push(cvb(w+.12,.5,d+.12,0,.25,0,pl,0,.06));
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(a=>L.push(cvb(.45,h,.45,a[0]*(w/2),h/2,a[1]*(d/2),mix(c,0xb89a60,.25),0,.05)));
+ L.push(cvb(w+.5,.4,d+.5,0,h+.2,0,tr));const nx=Math.max(3,Math.round(w/1.3)),nz=Math.max(3,Math.round(d/1.3));
+ for(let i=0;i<=nx;i++){const px=-w/2+i*(w/nx);if(i%2==0){L.push(cvb(.5,.45,.45,px,h+.62,-d/2-.02,tr));L.push(cvb(.5,.45,.45,px,h+.62,d/2+.02,tr))}}
+ for(let j=0;j<=nz;j++){const pz=-d/2+j*(d/nz);if(j%2==0){L.push(cvb(.45,.45,.5,-w/2-.02,h+.62,pz,tr));L.push(cvb(.45,.45,.5,w/2+.02,h+.62,pz,tr))}}
+ for(let i=0;i<4;i++){const px=-w/2+.8+i*((w-1.6)/3);L.push(cvb(.18,.18,.5,px,h-.15,d/2+.2,wood));L.push(cvb(.18,.18,.5,px,h-.15,-d/2-.2,wood))}
+ L.push(cvb(1.7,2.4,.14,0,1.2,d/2+.03,pl));L.push(cvb(1.3,2.1,.16,0,1.05,d/2+.05,dk));L.push(cvb(1.3,.12,.18,0,2.18,d/2+.05,wood));L.push(cvb(.1,.1,.2,.4,1.05,d/2+.14,0xd4a017));L.push(cvb(.05,2.1,.17,0,1.05,d/2+.06,0x4a362e));
+ [-1,1].forEach(s=>{const wx=s*Math.min(w/2-.9,Math.max(1.9,w/2-1.7)),wy=h*.64;L.push(cvb(1.3,1.2,.1,wx,wy,d/2+.03,wood));L.push(cvb(1.0,.9,.12,wx,wy,d/2+.05,gl));L.push(cvb(.08,.9,.14,wx,wy,d/2+.06,wood));L.push(cvb(1.0,.08,.14,wx,wy,d/2+.06,wood));L.push(cvb(.4,1.1,.1,wx-s*.78,wy,d/2+.06,0x3d7a5a,0,.1));L.push(cvb(.4,1.1,.1,wx+s*.78,wy,d/2+.06,0x3d7a5a,0,.1))});
+ L.push(cvb(.5,.5,.5,1.35,.25,d/2+.6,0xb5651d));L.push(cvb(.34,.2,.34,1.35,.6,d/2+.6,0xa5561a));
+ L.push(cvb(.4,.35,.4,-1.35,.2,d/2+.6,0xb5651d));L.push(cvb(.5,.4,.5,-1.35,.55,d/2+.6,0x4f8f3a));L.push(cvb(.3,.3,.3,-1.3,.9,d/2+.6,0xe86a9a));
+ if(h>5){const r=w*.28,cols=[0x1e88e5,0x2b9bf0],n=r>2?6:4;for(let i=0;i<n;i++){const hh=r/n,f=Math.sqrt(1-Math.pow((i+.5)/n,2)),sz=2*r*f*.9;L.push(cvb(sz,hh,sz,0,h+.6+i*hh+hh/2,0,cols[i%2],0,.05))}L.push(cvb(.18,.9,.18,0,h+.6+r+.4,0,0xd4a017));L.push(cvb(.34,.2,.34,0,h+.6+r+.15,0,0xd4a017))}
+ const m=mk(mergeC(L),MC,x,0,z);m.rotation.y=ry||0;col.push({x,z,w:w+.5,d:d+.5,ry:ry||0})}
+function stall(x,z,c){mk(stallGeo(c),MC,x,0,z);col.push({x,z:z+.35,w:4.2,d:2.3,ry:0})}
+function tent(x,z,c){const F0=[[84,60],[120,114],[113,34]];let b=F0[0],bd=1e9;F0.forEach(p=>{const d=Math.hypot(p[0]-x,p[1]-z);if(d<bd){bd=d;b=p}});const m=mk(tentGeo(c),MC,x,0,z);const ry=Math.atan2(b[0]-x,b[1]-z),sn=Math.sin(ry),k=Math.cos(ry);m.rotation.y=ry;col.push({x:x+.3*sn,z:z+.3*k,w:7,d:5.9,ry});col.push({x:x-4.2*k-.6*sn,z:z+4.2*sn-.6*k,r:.45})}
+// VILLA / DESA
+[[-16,-8,7,6,4.5,0xeedcb0],[-24,8,8,6,4,0xe6cf9c],[-14,12,6,5,3.6,0xf1e2bd,.2],[16,-12,7,6,5.5,0xe9d5a5],[17,6,7,6,4,0xf3e5c3],[-4,-26,8,6,4.5,0xe6cf9c],[7,-24,7,6,6,0xeedcb0],[24,-28,7,6,4.2,0xe9d5a5],[0,-42,9,7,6.5,0xf1e2bd]].forEach(a=>house(...a));
+bx(2.2,.5,2.2,0x9e9e9e,0,.25,0);mk(cyg(1.2,1.2,1,10),0x8d8d8d,0,.8,0);col.push({x:0,z:0,r:1.8});
+// MASJID
+{const g=new T.Group();g.position.set(-40,0,-24);scene.add(g);bx(16,7,12,0xf6ecd2,0,3.5,0,g);bx(17,.6,13,0xc9a36b,0,7.3,0,g);mk(new T.SphereGeometry(4.6,14,8,0,6.283,0,1.571),0xd4a017,0,7.6,0,g);mk(cyg(.15,.15,2,5),0xd4a017,0,13,0,g);mk(crescentG(),MC,0,13.9,0,g);[-7,7].forEach(a=>[-5,5].forEach(b=>mk(new T.SphereGeometry(1.1,10,6,0,6.283,0,1.571),0xd4a017,a,7.55,b,g)));
+bx(3,4.5,.2,0x2e7d32,0,2.25,6.1,g);[-5,5].forEach(o=>bx(2,3,.2,0x4fc3f7,o,3.8,6.1,g));mk(cyg(.9,1.1,15,10),0xf6ecd2,-10,7.5,-4,g);mk(new T.ConeGeometry(1.3,2.4,10),0xd4a017,-10,16.2,-4,g);mk(crescentG(),MC,-10,17.5,-4,g).scale.setScalar(.7);bx(2.4,.5,2.4,0xc9a36b,-10,14.9,-4,g);
+col.push({x:-40,z:-24,w:17,d:13,ry:0},{x:-50,z:-28,r:1.6})}
+// PASAR
+[0xe53935,0x1e88e5,0xfdd835,0x43a047,0xab47bc,0xfb8c00].forEach((c,i)=>stall(22+i*6,22,c));[0x00acc1,0xe53935,0xfdd835].forEach((c,i)=>stall(24+i*8,34,c));
+// OASIS
+{const gr=mk(new T.CircleGeometry(24,24),0x6fae4f,55,.03,-38);gr.rotation.x=-Math.PI/2;const w=mk(new T.CircleGeometry(11,24),0x2a9fd6,55,.06,-38);w.rotation.x=-Math.PI/2;col.push({x:55,z:-38,r:10.5});
+for(let i=0;i<16;i++){const a=i/16*6.28;palm(55+Math.cos(a)*(14+rnd(0,6)),-38+Math.sin(a)*(14+rnd(0,6)),rnd(.9,1.3))}oasisDeco(55,-38)}
+[[-30,18],[-20,26],[12,-10],[-8,-12],[20,16],[14,36],[-34,0],[40,2],[-6,34]].forEach(p=>palm(p[0],p[1],rnd(.9,1.2)));
+// GUA HIRA
+{mk(new T.ConeGeometry(20,22,7),0x8a6a45,-80,11,62);mk(new T.ConeGeometry(11,13,6),0x7a5a3a,-64,6.5,70);bx(5,4.5,2,0x2b1d10,-70,2.3,47.5);col.push({x:-80,z:62,r:16},{x:-64,z:70,r:8})}
+// KEMAH BADUI
+[[72,53,0xf5ecd8],[96,53,0x6d4c41],[96,68,0xe0d3b8],[84,72,0x5d4037]].forEach(a=>tent(...a));fire(84,60,1);
+camel(76,63,.5);camel(92,61,2);camel(84,47,4);
+/* ===== WILAYAH TAMBAHAN: KOTA HIDUP ===== */
+const TK=[],SH=[],MVS=[];TK.push((dt,t)=>{for(let i=0;i<FIRES.length;i++)FIRES[i](t)});
+function wall(x1,z1,x2,z2,h,c){const L=Math.hypot(x2-x1,z2-z1),m=bx(L,h,.8,c,(x1+x2)/2,h/2,(z1+z2)/2);m.rotation.y=Math.atan2(-(z2-z1),x2-x1);col.push({x:(x1+x2)/2,z:(z1+z2)/2,w:L+.8,d:1.2,ry:m.rotation.y})}
+function wellB(x,z){const L=[],st=[0x8d8d8d,0x9e9e9e,0x7d7d7d,0xa8a39a];
+ for(let k=0;k<2;k++)for(let i=0;i<10;i++){const a=i/10*6.2832+k*.3;L.push(cvb(.62,.4,.5,Math.cos(a)*1.2,.2+k*.4,-Math.sin(a)*1.2,st[(i+k*2)%4],a,.1))}
+ L.push(cvb(1.8,.06,1.8,0,.72,0,0x2a9fd6,0,.04));[-1.25,1.25].forEach(s=>L.push(cvb(.18,2.3,.18,s,1.5,0,0x6d4c41)));L.push(cvb(2.9,.18,.22,0,2.65,0,0x5d4037));
+ L.push(cvb(2.4,.12,1.8,0,2.85,0,0xa1887f));L.push(cvb(1.7,.12,1.2,0,2.97,0,0xb59a7f));L.push(cvb(.9,.12,.7,0,3.09,0,0xc9ae8f));
+ L.push(cvb(.1,.9,.1,0,2.1,0,0x8a6d3b));L.push(cvb(.5,.4,.5,0,1.4,0,0x6d4c41));L.push(cvb(.4,.1,.4,0,1.62,0,0x3a2a1e));
+ mk(mergeC(L),MC,x,0,z);col.push({x,z,r:1.7})}
+function shed(x,z,c){[[-1.8,-1.2],[1.8,-1.2],[-1.8,1.2],[1.8,1.2]].forEach(p=>mk(cyg(.1,.1,2.6,5),0x5d4037,x+p[0],1.3,z+p[1]));bx(4.6,.2,3.2,c,x,2.7,z);bx(1,.7,.7,0x424242,x,.35,z+.2);bx(.5,.3,.5,0x616161,x,.8,z+.2);fire(x+1.2,z-.4,.5,1);col.push({x,z,w:4.6,d:3.2,ry:0})}
+function tower(x,z,w,h,c){bx(w,h*.6,w,c,x,h*.3,z);bx(w*.75,h*.4,w*.75,c,x,h*.8,z);bx(w+.8,.4,w+.8,0xc9a36b,x,h*.6,z);mk(new T.SphereGeometry(w*.42,10,6,0,6.283,0,1.571),0xd4a017,x,h,z);bx(1.2,2,.15,0x5d4037,x,1,z+w/2+.05);bx(1,1,.15,0x4fc3f7,x,h*.4,z+w/2+.05);bx(1,1,.15,0x4fc3f7,x,h*.85,z+w*.375+.05);col.push({x,z,w:w+.8,d:w+.8,ry:0})}
+function musholla(x,z){bx(8,5,6,0xf6ecd2,x,2.5,z);mk(new T.SphereGeometry(2.6,10,6,0,6.283,0,1.571),0xd4a017,x,5,z);mk(cyg(.5,.6,9,8),0xf6ecd2,x+5,4.5,z-2);mk(crescentG(),MC,x,7.55,z).scale.setScalar(.8);mk(new T.ConeGeometry(.8,1.6,8),0xd4a017,x+5,9.8,z-2);bx(1.6,2.6,.15,0x2e7d32,x,1.3,z+3.05);col.push({x,z,w:8.4,d:6.4,ry:0},{x:x+5,z:z-2,r:1.2})}
+function rock(x,z,s){const k=Math.abs((x*3+z)|0)%3,m=mk(rockGeo(k+4,k),MC,x,0,z);m.scale.setScalar(s*.95);m.rotation.y=(x*.37)%6.28;mk(rockGeo((k+1)%3+9,2),MC,x+s*1.6,0,z-s*.6).scale.setScalar(s*.45);col.push({x,z,r:s*1.15},{x:x+s*1.6,z:z-s*.6,r:s*.55})}
+function flock(cx,cz,n,R){for(let i=0;i<n;i++)SH.push({g:sheep(cx,cz),hx:cx+rnd(-R,R)*.5,hz:cz+rnd(-R,R)*.5,ph:rnd(0,6),R:R*.6})}
+function mover(g,a,b,sp,off,cam){MVS.push({g,a,b,sp,off,cam,L:Math.hypot(b[0]-a[0],b[1]-a[1])})}
+TK.push((dt,t)=>{SH.forEach(s=>{const a=t*.3+s.ph,b=t*.23+s.ph*1.3;s.g.position.set(s.hx+Math.sin(a)*s.R,0,s.hz+Math.cos(b)*s.R*.7);s.g.rotation.y=Math.atan2(Math.sin(b)*.23*s.R*.7,Math.cos(a)*.3*s.R)});
+MVS.forEach(m=>{const u=(((t*m.sp/m.L+m.off)%2)+2)%2,s=u<1?u:2-u,k=u<1?1:-1,dx=(m.b[0]-m.a[0])*k,dz=(m.b[1]-m.a[1])*k;m.g.position.set(m.a[0]+(m.b[0]-m.a[0])*s,Math.abs(Math.sin(t*5+m.off*20))*.08,m.a[1]+(m.b[1]-m.a[1])*s);m.g.rotation.y=m.cam?Math.atan2(-dz,dx):Math.atan2(dx,dz)})});
+// A. kebun kurma & ladang (barat laut)
+for(let i=0;i<5;i++)for(let j=0;j<5;j++)palm(-108+i*9,-110+j*9,rnd(1,1.25));
+wheatField(-61,-100,14,9,"ripe");wheatField(-61,-72,14,9,"mix");wellB(-88,-66);house(-118,-62,5,4,3,0xe6cf9c);house(-60,-85,6,5,3.6,0xeedcb0,.3);
+// B. kawasan pengrajin (utara)
+[[-24,-70,8,6,4.5,0xe9d5a5],[-10,-80,7,7,6.5,0xf1e2bd],[12,-74,9,6,5,0xe6cf9c],[28,-86,8,8,7.5,0xeedcb0],[36,-66,7,6,4,0xf3e5c3],[-36,-84,8,7,5.5,0xe9d5a5,.4]].forEach(a=>house(...a));
+shed(0,-66,0xa1887f);stall(-18,-90,0xa1887f);[0,1,2].forEach(i=>mk(new T.SphereGeometry(.28,7,6),0xb5651d,-19.2+i*1.1,1.3,-89.8));bx(2.4,2.2,.3,0x5d4037,18,1.1,-62);[0xd32f2f,0x1565c0,0xfdd835].forEach((c,i)=>bx(.6,1.6,.08,c,17.2+i*.8,1.2,-61.8));col.push({x:18,z:-62,w:2.6,d:.6,ry:0});
+{const ball=mk(new T.SphereGeometry(.22,8,6),0xe53935,20,1,-50);TK.push((dt,t)=>{const s=(Math.sin(t*2)+1)/2;ball.position.set(16+8*s,.5+Math.abs(Math.cos(t*2))*1.1,-50);ball.visible=N.filter(o=>o.act=='catch').every(o=>o.st=='work'||o.st==null)})}
+// C. kota tinggi (timur laut) + penginapan kafilah
+tower(78,-70,9,16,0xf3e5c3);tower(96,-88,10,20,0xe9d5a5);tower(118,-72,9,14,0xeedcb0);house(100,-108,12,8,9,0xe6cf9c);house(126,-100,9,9,11,0xf1e2bd);house(76,-100,8,7,7,0xe9d5a5);
+{const c=0xd9bf8a;wall(99,-32,125,-32,3.5,c);wall(99,-32,99,-12,3.5,c);wall(125,-32,125,-12,3.5,c);wall(99,-12,109,-12,3.5,c);wall(115,-12,125,-12,3.5,c);bx(8,1.2,.8,0xc9a36b,112,4.2,-12);wellB(112,-24);camel(104,-27,.4);camel(121,-27,2.6)}
+{const ld=person({r:0x5d4037,h:W,s:0xb07d52,n:"Pemandu Kafilah"});scene.add(ld);mover(ld,[68,-56],[132,-56],1.6,.3,0);TK.push((dt,t)=>{const s=Math.sin(t*9)*.55;ld.lL.rotation.x=-s;ld.lR.rotation.x=s;ld.aL.rotation.x=s*.8;ld.aR.rotation.x=-s*.8});for(let i=0;i<3;i++){const c=camel(0,0,0);col.pop();mover(c,[68,-56],[132,-56],1.6,.23-.07*i,1)}}
+// D. permukiman & kandang (selatan)
+[[-48,62,7,6,4,0xeedcb0],[-36,74,8,6,5.5,0xe6cf9c],[-22,60,7,7,4.5,0xf1e2bd],[-10,76,9,6,6.5,0xe9d5a5],[-44,92,8,7,4,0xf3e5c3],[-26,100,7,6,5.2,0xeedcb0],[-8,98,8,8,7,0xe6cf9c]].forEach(a=>house(...a));tower(-52,112,8,13,0xf1e2bd);musholla(34,112);wellB(4,58);
+{const c=0xb08d57;wall(10,90,26,90,1.2,c);wall(10,102,26,102,1.2,c);wall(10,90,10,102,1.2,c);wall(26,90,26,102,1.2,c);flock(18,96,7,6)}
+// E. pasar unta (timur)
+[[110,28,0xd7ccc8],[122,34,0x8d6e63],[104,40,0xf5ecd8]].forEach(a=>tent(...a));camel(119,22,.3);camel(100,26,2);camel(124,44,4);stall(113,38,0xe65100);
+// F. tambang batu (barat)
+[[-104,-12,2.2],[-110,-2,3],[-100,-26,1.8],[-118,-14,2.5],[-96,-4,1.6],[-114,-32,2]].forEach(a=>rock(...a));house(-124,-28,6,5,3.5,0xd9c39a);
+// G. kemah Badui kedua (tenggara) + kawanan domba
+[[110,106,0xe0d3b8],[129,106,0x6d4c41],[120,126,0xf5ecd8]].forEach(a=>tent(...a));camel(112,119,1);camel(128,119,3.5);fire(120,114,1);flock(121,94,5,6);flock(57,50,5,6);
+// isi ruang kosong dengan pepohonan & semak
+const AV2=[[-54,0,16],[0,12,9],[55,-38,26],[-61,-100,9],[-61,-72,9],[50,96,24],[88,96,24],[50,125,20],[88,125,20],[69,100,12],[80,26,16],[86,8,9],[-8,46,14],[-34,46,9],[34,94,10],[29,106,5],[52,30,4],[55,-27,4],[98,33,4],[111,-18,5]];N.forEach(o=>AV2.push([o.x,o.z,3]));MS.forEach(m=>m.items.forEach(t=>AV2.push([t[0],t[1],4])));
+function frees(x,z,r){if(Math.abs(x)>BX-3||Math.abs(z)>BX-3)return false;for(const a of AV2)if(Math.hypot(x-a[0],z-a[1])<a[2]+r)return false;for(const c of col)if(Math.hypot(x-c.x,z-c.z)<(c.r||Math.hypot(c.w,c.d)/2)+r)return false;for(const p of palms)if(Math.hypot(x-p[0],z-p[1])<2.5+r)return false;return true}
+for(let i=0,n=0;i<500&&n<42;i++){const x=rnd(-136,136),z=rnd(-136,136);if(frees(x,z,2.5)){palm(x,z,rnd(.9,1.3));n++}}
+{const AC=[];for(let i=0,n=0;i<500&&n<26;i++){const x=rnd(-136,136),z=rnd(-136,136);if(frees(x,z,3)){AC.push([x,z,rnd(.9,1.4)]);col.push({x,z,r:.7});n++}}
+inst(acaciaGeo(),MC,AC.map(a=>[a[0],0,a[1],a[2],a[2],a[2],((a[0]*7|0)%4)*1.5708]));
+const SB=[],RK=[];for(let i=0,n=0;i<900&&n<170;i++){const x=rnd(-138,138),z=rnd(-138,138);if(frees(x,z,1)){{const q=rnd(.7,1.25);SB.push([x,0,z,q,q*rnd(.9,1.15),q,Math.floor(rnd(0,4))*1.5708]);col.push({x,z,r:.6*q})};n++}}
+for(let i=0,n=0;i<600&&n<70;i++){const x=rnd(-138,138),z=rnd(-138,138),q=rnd(.5,1.2);if(frees(x,z,2)){RK.push([x,0,z,q*1.1,q*1.1,q*1.1,Math.floor(rnd(0,4))*1.5708]);col.push({x,z,r:1.2*q});n++}}
+[0,1,2].forEach(k=>inst(bushGeo(k),MC,SB.filter((_,i)=>i%3==k)));[0,1,2].forEach(k=>inst(rockGeo(k+1,k),MC,RK.filter((_,i)=>i%3==k)));
+const TF=[],CC=[];for(let i=0,n=0;i<1200&&n<260;i++){const x=rnd(-138,138),z=rnd(-138,138);if(frees(x,z,.6)){const q=rnd(.8,1.3);TF.push([x,0,z,q,q*rnd(.8,1.3),q,rnd(0,6.28)]);n++}}
+for(let i=0,n=0;i<600&&n<26;i++){const x=rnd(-138,138),z=rnd(-138,138);if(frees(x,z,2)){const q=rnd(.8,1.3);CC.push([x,0,z,q,q,q,rnd(0,6.28)]);col.push({x,z,r:.6*q});n++}}
+inst(tuftGeo(0),MC,TF);[0,1].forEach(k=>inst(cactusGeo(k),MC,CC.filter((_,i)=>i%2==k)))}
+drawPalms();
+const gW=[];
+bx(17,.04,14,0xc9a227,-54,.02,2);bx(15,.06,12,0x8e2430,-54,.03,2);bx(7,.4,3.4,0x8d6e3f,-54,.2,-8.2);bx(1.6,1.1,.8,0x5d4037,-54,.95,-6.9);col.push({x:-54,z:-6.9,w:1.8,d:1,ry:0});
+function bub(w,h,fs){const c=document.createElement("canvas");c.width=w;c.height=h;const x=c.getContext("2d"),t=new T.CanvasTexture(c),s=new T.Sprite(new T.SpriteMaterial({map:t,transparent:true,depthWrite:false}));return{s,draw(txt){x.clearRect(0,0,w,h);x.fillStyle="#2b1d10";x.fillRect(0,0,w,h);x.fillStyle="#e3c88f";x.fillRect(8,8,w-16,h-16);x.fillStyle="#d2b277";for(let q=8;q<h-16;q+=16)x.fillRect(8,q+12,w-16,4);x.fillStyle="#2b1d10";x.font="bold "+fs+"px sans-serif";x.textAlign="center";x.textBaseline="middle";const ws=txt.split(" "),L=[];let c1="";ws.forEach(q=>{if(x.measureText(c1+" "+q).width>w-40&&c1){L.push(c1);c1=q}else c1=c1?c1+" "+q:q});L.push(c1);L.forEach((l,i)=>x.fillText(l,w/2,h/2+(i-(L.length-1)/2)*(fs+6)));t.needsUpdate=true}}}
+
+/* ===== ORANG ===== */
+const NP=[],MK=[];
+N.forEach((o,i)=>{const g=person(o);g.position.set(o.x,o.by||0,o.z);scene.add(g);o.g=g;o.ph=Math.random()*6;o.i=i;o.x0=o.x;o.z0=o.z;o.dir=1;col.push({x:o.x,z:o.z,r:.6,npc:o});
+if(o.m>=0||o.cr||o.eco){const m=mk(new T.OctahedronGeometry(.28),new T.MeshBasicMaterial({color:0xffc107}),0,3.1,0,g);o.mk=m}else{}});
+const av=person({r:0xffffff,h:0xd32f2f,s:0xd2a679,n:"Pemain",hero:1});scene.add(av);const US=N.find(o=>o.cr),ub=bub(512,160,34);ub.s.scale.set(7,2.2,1);ub.s.position.y=3.7;US.g.add(ub.s);let ubi=-1,told=0;
+
+/* ===== BENDA MISI ===== */
+const IT=[];MS.forEach((m,mi)=>m.items.forEach((t,k)=>{const g=new T.Group();g.position.set(t[0],0,t[1]);scene.add(g);mk(new T.OctahedronGeometry(.5),new T.MeshBasicMaterial({color:0x00e5ff}),0,1.2,0,g);const b=mk(cyg(.15,.15,14,6),new T.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:.35}),0,7,0,g);IT.push({m:mi,k,g,n:t[2]})}));
+/* ===== UI ===== */
+let UI=true,started=false;
+function say(h,t,bs,rich){UI=true;$("dh").textContent=h;const e0=$("dt");e0.className="t"+(rich?" rich":"");if(rich)e0.innerHTML=t;else e0.textContent=t;e0.scrollTop=0;const d=$("db");d.innerHTML="";(bs||[{t:"OK",fn:hide}]).forEach((b,i)=>{const e=document.createElement("button");e.className="b"+(i==0&&bs&&bs.length==1?" m":"");e.textContent=b.t;e.onclick=()=>{b.fn?b.fn():hide()};d.appendChild(e)});$("dlg").style.display="flex";keys={};jv={x:0,y:0}}
+function hide(){$("dlg").style.display="none";UI=false}
+function toast(t){const e=$("tt");e.textContent=t;e.style.display="block";clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display="none",3500)}
+const done=()=>S.ms.every(s=>s==3);
+function hud(){$("who").textContent="👤 "+S.name+"  •  ⭐ "+S.pts+"  •  ✅ "+S.ms.filter(s=>s==3).length+"/"+MS.length+"  •  🪙 "+(S.eco?Math.floor(S.eco.coins):0)}
+function misList(){say("📋 Daftar Misi",MS.map((m,i)=>{const s=S.ms[i],ind=s==3?"SELESAI ✅":s==1?"Cari benda "+S.it[i]+"/"+m.items.length+" 🔍":s==2?"Soal "+S.qi[i]+"/"+m.q.length+" 📝":"Belum dimulai ⬜";return (i+1)+". "+m.t+" ("+m.b+")\n    Lokasi: "+N[m.who].n+" • "+ind}).join("\n")+"\n\nPoin: "+S.pts+" / "+MAXP+(S.ms.some(s=>s==3)?"\nLencana: "+MS.filter((m,i)=>S.ms[i]==3).map(m=>m.badge).join(" "):""),[{t:"Tutup"}])}
+function howTo(){say("🎮 Cara Bermain","• Gerak: W A S D / panah (Shift = lari) atau joystick kiri layar.\n• Lihat sekeliling: geser mouse/jari.\n• Bicara & ambil: tombol E (atau tombol E di layar).\n• Ganti kamera: tombol C atau 📷.\n• Daftar misi: tombol M atau 📋.\n• Rumah & pekerjaan: tombol H atau 🏠. Cari tokoh bertanda ◆ oranye (pemberi kerja, agen rumah, toko). Kumpulkan koin, beli rumah di Perumahan Al-Barakah (tenggara), lalu tingkatkan sampai Level 11. Koin emas tersembunyi juga ada di seluruh dunia.\n• Majelis Ilmu (dekat masjid): dengarkan ceramah Ustaz Fauzan, lalu tanya jawab materi. Pertanyaan baru memberi +2 poin.\n• Temui 6 tokoh bertanda ◆ kuning, pelajari materi, lalu jawab soal. Jawaban salah ada penjelasan dan boleh mencoba lagi.\n• Permainan tamat setelah SEMUA misi selesai dengan benar!",[{t:"Mengerti"}])}
+function menu(){say("☰ Menu",`Poin ${S.pts} • Misi selesai ${S.ms.filter(s=>s==3).length}/${MS.length}`,[{t:"▶ Lanjutkan",fn:hide},{t:"📋 Daftar Misi",fn:misList},{t:"🏠 Rumah & Pekerjaan",fn:ecoMenu},{t:"🎵 Musik: "+MUS.label(),fn:MUS.panel},{t:"🔔 Efek suara: "+SFX.label(),fn:()=>{SFX.toggle();menu()}},{t:"🎮 Cara Bermain",fn:howTo},{t:"🔄 Ulangi dari Awal",fn:()=>say("Ulangi dari awal?","Semua progres akan dihapus.",[{t:"Ya, hapus progres",fn:()=>{const n=S.name,c=S.cam;S={name:n,ms:MS.map(_=>0),qi:MS.map(_=>0),it:MS.map(_=>0),pts:0,cam:c,x:0,z:12,tr:0,tk:{},qa:{},eco:null};P.x=0;P.z=12;ecoReset();save();hud();hide()}},{t:"Batal",fn:hide}])}])}
+/* ===== DIALOG & MISI ===== */
+
+const esc=t=>String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"),KWR=/(Al-Wahhab|Al-Baqa'|Ahlul Hadar|Ahlul Badui|Wujud|Qidam|Baqa'|Wahdaniyah|Iqra'|Fana|Adam|qada|balig)/g,kw=t=>esc(t).replace(KWR,"<mark>$1</mark>");
+const avOf=o=>o.f?"🧕":(o.k&&o.k<.9)?"🧒":"🧔";
+function who(o,sub){return '<div class="who"><div class="av">'+avOf(o)+'</div><div><b>'+esc(o.n)+'</b><small>'+esc(sub||"")+'</small></div></div>'}
+function matHTML(txt){return '<ul class="mt">'+txt.split("\n").map(l=>{const q=l.match(/^([A-Z][^:.]{1,38}):\s*(.+)$/);return '<li>'+(q?'<b>'+esc(q[1])+':</b> '+kw(q[2]):kw(l))+'</li>'}).join("")+'</ul>'}
+function stepsH(m,s){const L=m.items.length?["📖 Materi","🔍 Tugas","📝 Kuis"]:["📖 Materi","📝 Kuis"],cur=s==3?L.length:m.items.length?s:(s==0?0:1);return '<div class="steps">'+L.map((x,i)=>'<span class="'+(i<cur?"ok":i==cur?"on":"")+'">'+x+'</span>').join("")+'</div>'}
+function matView(m,back){say("📖 "+m.t,'<div class="chip">'+esc(m.b)+'</div><div class="sec">📖 Materi</div>'+matHTML(m.mat),[{t:"◀ Kembali",fn:back}],1)}
+function talk(o){const m=o.m>=0?MS[o.m]:null;
+if(!m){if(o.eco)return ecoTalk(o);if(o.cr)return ceramah();o.sn=(o.sn||0);const l=o.say[o.sn++%o.say.length];return say(o.n,who(o,"Warga negeri padang pasir")+'<div class="sp">'+esc(l)+'</div>',[{t:"Terima kasih 🙏"}],1)}
+const i=o.m,s=S.ms[i],hd=who(o,"Misi "+(i+1)+" • "+m.b)+stepsH(m,s);
+if(s==3)return say("✅ Misi Selesai",hd+'<div class="sp">Kamu sudah menyelesaikan misi <b>'+esc(m.t)+'</b>. Ini ringkasan materinya:</div><div class="sec">📖 Ringkasan Materi</div>'+matHTML(m.mat)+'<div class="res ok" style="text-align:center">'+esc(m.badge)+'</div>',[{t:"Terima kasih 🙏"}],1);
+if(s==0)return say(m.t,hd+'<div class="sp">'+"Assalamu'alaikum, <b>"+esc(S.name)+'</b>! Dengarkan materi berikut dengan baik ya.</div><div class="sec">📖 Materi</div>'+matHTML(m.mat),[{t:m.items.length?"Siap, aku mulai tugasnya ▶":"Mulai kuis ▶",fn:()=>{if(m.items.length){S.ms[i]=1;save();hide();toast("🔍 "+m.task)}else{S.ms[i]=2;save();quiz(i)}}}],1);
+if(s==1)return say(m.t,hd+'<div class="sec">🔍 Tugasmu</div><div class="sp">'+esc(m.task)+'</div><div class="pg"><i style="width:'+Math.round(S.it[i]/m.items.length*100)+'%"></i></div><small>Benda ditemukan: '+S.it[i]+'/'+m.items.length+'</small>',[{t:"Baik"},{t:"📖 Baca materi lagi",fn:()=>matView(m,()=>talk(o))}],1);
+quiz(i)}
+
+/* ===== CERAMAH & TANYA JAWAB ===== */
+function ceramah(){say("🎙️ Majelis Ilmu – Ustaz Fauzan","Assalamu'alaikum, "+S.name+"! Pilih topik ceramah, atau ketik pertanyaanmu sendiri. Setiap pertanyaan baru memberi +2 poin.",MS.map((m,i)=>({t:(i+1)+". "+m.t,fn:()=>topik(i)})).concat([{t:"✍️ Ketik pertanyaanku",fn:ketik},{t:"Tutup"}]))}
+function topik(i){say("🎙️ "+MS[i].t,'<div class="chip">'+esc(MS[i].b)+'</div><div class="sec">📖 Materi</div>'+matHTML(MS[i].mat),[{t:"❓ Tanya jawab topik ini",fn:()=>qaList(i)},{t:"◀ Topik lain",fn:ceramah},{t:"Tutup"}],1)}
+function qaList(i){say("❓ Tanya Jawab: "+MS[i].t,"Pilih pertanyaan:",F.filter(e=>e.i==i).map(e=>({t:e.q,fn:()=>jawab(e)})).concat([{t:"◀ Kembali",fn:()=>topik(i)}]))}
+function jawab(e){const nw=!S.qa[e.k];if(nw){S.qa[e.k]=1;S.pts+=2;save();hud()}say("💬 Tanya Jawab",'<div class="q">❓ '+esc(e.q)+'</div><div class="res ok">💡 '+kw(e.a)+'</div>'+(nw?'<div class="chip">⭐ +2 poin karena rasa ingin tahumu!</div>':""),[{t:"❓ Tanya lagi",fn:()=>qaList(e.i)},{t:"Topik lain",fn:ceramah},{t:"Selesai"}],1)}
+function ketik(){say("✍️ Tanya Ustaz","Ketik pertanyaan tentang materi PAI (contoh: apa itu sifat jaiz?)",[{t:"◀ Kembali",fn:ceramah}]);const d=$("db"),inp=document.createElement("input");inp.placeholder="Tulis pertanyaanmu...";inp.maxLength=80;const b=document.createElement("button");b.className="b m";b.textContent="Tanya";const go=()=>{const tk=inp.value.toLowerCase().match(/[a-z']{3,}/g)||[];let best=null,bs=0;F.forEach(e=>{const h=(e.q+" "+e.kw).toLowerCase();const sc=tk.filter(w=>h.includes(w)).length;if(sc>bs){bs=sc;best=e}});if(best)jawab(best);else say("🤔 Hmm...","Ustaz belum menemukan jawabannya. Coba kata kunci seperti: puasa, jaiz, Al-Wahhab, Badui, guru, atau pilih dari daftar topik.",[{t:"◀ Coba lagi",fn:ketik},{t:"Pilih topik",fn:ceramah}])};b.onclick=go;inp.addEventListener("keydown",e=>{if(e.key=="Enter")go()});d.insertBefore(b,d.firstChild);d.insertBefore(inp,d.firstChild);setTimeout(()=>{try{inp.focus()}catch(e){}},50)}
+function quiz(i){const m=MS[i],k=S.qi[i];if(k>=m.q.length)return fin(i);const q=m.q[k],ans=q[1][q[2]],pg='<div class="pg"><i style="width:'+Math.round(k/m.q.length*100)+'%"></i></div>';
+say("📝 Soal "+(k+1)+" dari "+m.q.length,'<div class="chip">'+esc(m.t)+'</div>'+pg+'<div class="q">'+esc(q[0])+'</div>',shuf(q[1]).map((x,j)=>({t:String.fromCharCode(65+j)+". "+x,fn:()=>{if(x===ans){S.pts+=S.tr?5:10;S.tr=0;S.qi[i]++;save();hud();SFX.ok();say("✅ Benar!",'<div class="res ok"><b>Jawaban:</b> '+esc(ans)+'</div><div class="res">💡 '+esc(q[3])+'</div>',[{t:"Lanjut ▶",fn:()=>quiz(i)}],1)}else{S.tr=1;SFX.no();say("❌ Belum tepat",'<div class="res no">💡 Petunjuk: '+esc(q[3])+'</div><div class="sp">Ingat materinya dan coba lagi, ya!</div>',[{t:"Coba lagi ↻",fn:()=>quiz(i)},{t:"📖 Baca materi lagi",fn:()=>matView(m,()=>quiz(i))}],1)}}})),1)}
+function fin(i){const m=MS[i];SFX.win();S.ms[i]=3;S.pts+=20;save();hud();
+say("🏅 Misi Selesai!",'<div class="res ok" style="text-align:center;font-size:18px">'+esc(m.badge)+'</div><div class="sp"><b>'+esc(m.t)+'</b> tuntas!<br>Bonus +20 poin • Total poin: <b>'+S.pts+'</b></div>',[{t:"Lanjut ▶",fn:()=>{hide();if(done())ending();else{const n=S.ms.findIndex(s=>s!=3);toast("Misi berikutnya: temui "+N[MS[n].who].n)}}}],1)}
+function ending(){SFX.end();say("🎉 TAMAT! Alhamdulillah!","Selamat, "+S.name+"! Kamu menyelesaikan SEMUA misi PAI BAB 1–5.\n\nSkor akhir: "+S.pts+" / "+MAXP+"\n"+MS.map(m=>m.badge).join("\n")+"\n\nTerus belajar, berbakti kepada orang tua, dan hormati guru ya!",[{t:"Jelajah lagi 🏜️",fn:hide},{t:"Main ulang dari awal",fn:()=>{const n=S.name,c=S.cam;S={name:n,ms:MS.map(_=>0),qi:MS.map(_=>0),it:MS.map(_=>0),pts:0,cam:c,x:0,z:12,tr:0,tk:{},qa:{},eco:null};P.x=0;P.z=12;ecoReset();save();hud();hide()}}])}
+/* ===== KONTROL ===== */
+let keys={},jv={x:0,y:0},yaw=0,pitch=0;const P={x:0,z:12,y:0,vy:0,fa:0};
+addEventListener("keydown",e=>{if(e.target.tagName=="INPUT")return;if(!started)return;if(e.code=="KeyE"||e.code=="Space"&&UI===false&&0)act();if(e.code=="KeyC")camT();if(e.code=="KeyN"&&!UI)MUS.toggle();if(e.code=="KeyM"&&!UI)misList();if(e.code=="KeyH"&&!UI)ecoMenu();if(e.code=="Escape"){UI?(started&&$("dlg").style.display!="none"&&hide()):menu()}keys[e.code]=1;if(e.code=="Space"&&!UI&&P.y==0)P.vy=6;if(e.code.startsWith("Arrow")||e.code=="Space")e.preventDefault()});
+addEventListener("keyup",e=>keys[e.code]=0);
+let jp=null,lp=null;const joy=$("joy"),jk=joy.firstElementChild;
+cv.addEventListener("pointerdown",e=>{if(UI)return;cv.setPointerCapture(e.pointerId);if(e.pointerType=="touch"&&e.clientX<innerWidth*.45&&!jp){jp={id:e.pointerId,x:e.clientX,y:e.clientY};joy.style.left=e.clientX+"px";joy.style.top=e.clientY+"px";joy.style.display="block"}else if(!lp)lp={id:e.pointerId,x:e.clientX,y:e.clientY}});
+cv.addEventListener("pointermove",e=>{if(jp&&e.pointerId==jp.id){const dx=cl((e.clientX-jp.x)/45,-1,1),dy=cl((e.clientY-jp.y)/45,-1,1);jv={x:dx,y:-dy};jk.style.transform=`translate(${dx*30}px,${dy*30}px)`}else if(lp&&e.pointerId==lp.id){const k=e.pointerType=="touch"?.006:.004;yaw-=(e.clientX-lp.x)*k;pitch=cl(pitch-(e.clientY-lp.y)*k,-1.3,1.3);lp.x=e.clientX;lp.y=e.clientY}});
+const up=e=>{if(jp&&e.pointerId==jp.id){jp=null;jv={x:0,y:0};joy.style.display="none";jk.style.transform=""}if(lp&&e.pointerId==lp.id)lp=null};cv.addEventListener("pointerup",up);cv.addEventListener("pointercancel",up);
+const coarse=matchMedia("(pointer:coarse)").matches;
+function camT(){if(UI)return;S.cam=S.cam==1?2:1;save();toast(S.cam==1?"👁️ First Person":"🧍 Third Person")}
+$("bCam").onclick=camT;$("bMis").onclick=()=>!UI&&misList();$("bMenu").onclick=()=>!UI&&menu();$("bE").onclick=()=>act();
+let near=null;function act(){if(UI||!near)return;P.ia=1;if(near.fn)near.fn();else talk(near)}
+/* ===== EKONOMI: PEKERJAAN SAMPINGAN & PEMBANGUNAN RUMAH ===== */
+const fl=n=>Math.floor(n+1e-9),mc=()=>S.ms.filter(s=>s==3).length,TN={camel:"Unta",sheep:"Domba"},IC={camel:"🐪",sheep:"🐑"};
+const FURN={bed:{n:"Tempat Tidur",ic:"🛏️",p:60},table:{n:"Meja",ic:"🍽️",p:45},chair:{n:"Kursi",ic:"💺",p:25},carpet:{n:"Karpet",ic:"🟥",p:70},ward:{n:"Lemari",ic:"🗄️",p:80}};
+const HOMES=[
+{n:"Rumah Pasir Teduh",p:200,c:0xe2c48a,r:0x8d6e3f,d:"Rumah tanah liat sederhana berwarna pasir. Paling terjangkau."},
+{n:"Rumah Kurma Hijau",p:260,c:0xdcd0a0,r:0x2e7d32,d:"Aksen hijau yang sejuk, seperti kebun kurma."},
+{n:"Rumah Lembah Biru",p:320,c:0xd6dde0,r:0x1565c0,d:"Dinding terang dengan hiasan biru seperti air oasis."},
+{n:"Rumah Mawar Gurun",p:400,c:0xe8c9c0,r:0x8e2430,d:"Dinding merah muda dengan aksen merah anggur."}];
+const PLOTS=[[50,84],[88,84],[50,119],[88,119]];
+const LNAME=["Rumah Sederhana","Rumah Berjendela","Rumah Berpagar","Rumah Berkebun","Rumah Hias Emas","Rumah Beranda Tiang","Rumah Bersayap","Rumah Dua Lantai","Rumah Berkubah","Rumah Bermenara","Istana Taman Air","Istana Agung Padang Pasir"];
+const LDESC=["Rumah tanah liat satu ruangan.","Dinding lebih terang dan jendela bertambah.","Pagar halaman depan.","Taman kurma di halaman.","Hiasan emas di atap.","Beranda dengan tiang megah.","Sayap ruangan baru di samping.","Lantai kedua di atas rumah.","Kubah biru berpuncak emas.","Menara azan setinggi rumah.","Halaman luas dengan air mancur.","Istana: gerbang menara, menara kembar, dan karpet merah."];
+// syarat upgrade ke level n (n=1..11): p=koin, f=perabot, pen=kandang, a=ternak, j=total pekerjaan, jb=pekerjaan tertentu, m=misi PAI selesai
+const UP=[null,
+{p:100,f:{bed:1},j:3},
+{p:150,f:{table:1,chair:1},j:6},
+{p:220,f:{carpet:1},pen:["sheep"],a:{sheep:2},jb:{domba:1}},
+{p:300,f:{ward:1},pen:["camel"],a:{camel:1},jb:{unta:1},m:1},
+{p:400,f:{chair:2},a:{sheep:4},j:12,jb:{pakan:2}},
+{p:520,f:{bed:2},a:{camel:2},jb:{dagang:3},m:2},
+{p:660,f:{carpet:2,chair:3},a:{sheep:6},j:25},
+{p:820,f:{ward:2},a:{camel:3},jb:{air:3},m:3},
+{p:1000,f:{table:2,chair:4},a:{sheep:8,camel:4},j:40,m:4},
+{p:1250,f:{bed:3},a:{camel:5},jb:{pakan:8,unta:6},m:5},
+{p:1500,f:{bed:3,table:2,chair:4,carpet:2,ward:2},a:{sheep:9,camel:5},j:60,m:6}];
+const PRC={pen:{camel:150,sheep:100},an:{camel:220,sheep:90}},PR={camel:8,sheep:4};
+const fmax=(k,lv)=>k=="bed"?1+(lv>=4)+(lv>=8):k=="table"?1+(lv>=6):k=="chair"?Math.min(4,1+Math.floor(lv/2)):k=="carpet"?1+(lv>=5):1+(lv>=6);
+const acap=(t,lv)=>t=="camel"?2+Math.floor(lv/3):4+Math.floor(lv/2);
+const JOBS={
+unta:{n:"Menggiring Unta ke Kandang",ic:"🐪",rw:60,k:"herd",type:"camel",cnt:3,spawn:[80,28,7],rect:[81,4,91,12],open:"s",arena:[64,-2,98,42],giver:"Juragan Ubaid",loc:"timur, dekat Pasar Unta",
+ say:"Untaku lepas dari kandang! Giring 3 ekor unta ke kandang kayu di utara. Unta menjauh bila kamu terlalu dekat, jadi berdirilah di belakang unta dan dorong pelan-pelan.",pai:"Menyayangi hewan dan merawatnya dengan sabar adalah akhlak terpuji."},
+domba:{n:"Mengumpulkan Kawanan Domba",ic:"🐑",rw:50,k:"herd",type:"sheep",cnt:5,spawn:[-8,46,8],rect:[-39,42,-29,50],open:"e",arena:[-46,34,8,56],giver:"Gembala Sulaiman",loc:"barat daya, padang di selatan desa",
+ say:"Kawanan dombaku tercerai-berai. Kumpulkan 5 ekor domba ke kandang kayu di sebelah barat. Mereka lari bila kamu mendekat dari depan.",pai:"Menjaga amanah (hewan titipan) adalah sifat terpuji."},
+pakan:{n:"Memberi Makan Ternak",ic:"🌾",rw:40,k:"wp",giver:"Peternak Qasim",loc:"selatan, dekat kandang domba",
+ say:"Ternakku lapar! Ambil jerami dari tumpukan, lalu isi tiga palung satu per satu.",pai:"Memberi makan hewan adalah perbuatan baik dan berpahala.",
+ pts:[{p:[34,86],l:"Ambil jerami di tumpukan",c:"Jerami"},{p:[29.5,94],l:"Isi palung 1"},{p:[34,86],l:"Ambil jerami lagi",c:"Jerami"},{p:[29.5,102],l:"Isi palung 2"},{p:[34,86],l:"Ambil jerami lagi",c:"Jerami"},{p:[29.5,108],l:"Isi palung 3"}]},
+dagang:{n:"Membantu Pedagang",ic:"🧺",rw:45,k:"wp",giver:"Pedagang Sibuk Zubair",loc:"Pasar, tenggara dari titik awal",
+ say:"Pelangganku banyak, aku tak sempat mengantar! Ambil barang di kios, lalu antarkan ke pembelinya.",pai:"Tolong-menolong dan berdagang dengan jujur adalah akhlak terpuji.",
+ pts:[{p:[35,31.5],l:"Ambil kain di kios Bu Salma",c:"Kain"},{p:[27,19.5],l:"Antar ke Pak Wahab"},{p:[37,19.5],l:"Ambil kurma di kios Pak Zaid",c:"Kurma"},{p:[-12,19.5],l:"Antar ke Ibu Aminah"},{p:[52,31],l:"Ambil karung gandum di gudang",c:"Karung gandum"},{p:[44,29.5],l:"Serahkan ke Zubair"}]},
+air:{n:"Mengantar Air dari Oasis",ic:"💧",rw:30,k:"wp",giver:"Pak Rahim",loc:"dekat Oasis, timur laut",
+ say:"Penginapan dan pasar unta kehabisan air. Timba air di oasis, lalu antarkan ke sana.",pai:"Air adalah nikmat dari Allah, Al-Wahhab. Berbagi air itu berpahala.",
+ pts:[{p:[55,-26.5],l:"Timba air di oasis",c:"Air"},{p:[111,-18],l:"Antar ke penginapan kafilah"},{p:[55,-26.5],l:"Timba air lagi",c:"Air"},{p:[98,33],l:"Antar ke pasar unta"}]}};
+const newEco=()=>({coins:0,jobs:{},cd:{},total:0,home:-1,lvl:0,furn:{bed:0,table:0,chair:0,carpet:0,ward:0},pens:{camel:0,sheep:0},an:{camel:0,sheep:0},hun:{camel:100,sheep:100},prod:{camel:0,sheep:0},cc:{}});
+let ecoWorld=0,JB=null,pin=null,bld=null,ecoHT=0;
+const EI=[],HG=[],PA=[],PL=[],CP=[];
+const EID={n:"Rumah Milikmu",x:0,z:0,ir:4.5,ok:()=>S.eco&&S.eco.home>=0,fn:()=>homeMenu()};
+const EIP={camel:{n:"Kandang Unta",x:0,z:0,ir:7,ok:()=>S.eco&&S.eco.home>=0,fn:()=>penMenu("camel")},sheep:{n:"Kandang Domba",x:0,z:0,ir:7,ok:()=>S.eco&&S.eco.home>=0,fn:()=>penMenu("sheep")}};
+EI.push(EID,EIP.camel,EIP.sheep);
+let JMK=null;
+/* ---------- util ---------- */
+function addCoins(n){SFX.coin();const E=S.eco;E.coins=Math.round((E.coins+n)*100)/100;hud();save()}
+function spend(n){const E=S.eco;if(E.coins+1e-9<n)return false;E.coins=Math.round((E.coins-n)*100)/100;hud();save();return true}
+function sx(h,t,bs){say(h,t,bs);[...$("db").children].forEach((e,i)=>{if(bs[i]&&bs[i].dis)e.classList.add("dis")})}
+const bar=v=>"█".repeat(Math.round(v/10))+"░".repeat(10-Math.round(v/10));
+function reqs(L){const u=UP[L],E=S.eco,r=[];
+ r.push({c:1,t:"🪙 Koin "+fl(E.coins)+"/"+u.p,ok:E.coins>=u.p});
+ for(const k in u.f||{})r.push({t:FURN[k].ic+" "+FURN[k].n+" "+E.furn[k]+"/"+u.f[k],ok:E.furn[k]>=u.f[k]});
+ (u.pen||[]).forEach(t=>r.push({t:"🏗️ Kandang "+TN[t],ok:!!E.pens[t]}));
+ for(const k in u.a||{})r.push({t:IC[k]+" "+TN[k]+" "+E.an[k]+"/"+u.a[k],ok:E.an[k]>=u.a[k]});
+ if(u.j)r.push({t:"💼 Total pekerjaan "+E.total+"/"+u.j,ok:E.total>=u.j});
+ for(const k in u.jb||{})r.push({t:"💼 "+JOBS[k].n+" "+(E.jobs[k]||0)+"/"+u.jb[k],ok:(E.jobs[k]||0)>=u.jb[k]});
+ if(u.m)r.push({t:"📖 Misi PAI selesai "+mc()+"/"+u.m,ok:mc()>=u.m});
+ return r}
+function ecoSanitize(){const E=S.eco;E.coins=Math.max(0,+E.coins||0);E.home=Math.floor(E.home);if(!(E.home>=0&&E.home<4))E.home=-1;
+ if(E.home<0){E.lvl=0;for(const k in E.furn)E.furn[k]=0;E.pens.camel=E.pens.sheep=0;E.an.camel=E.an.sheep=0}
+ E.lvl=cl(Math.floor(E.lvl)||0,0,11);
+ for(let L=1;L<=E.lvl;L++){if(!reqs(L).filter(r=>!r.c).every(r=>r.ok)){E.lvl=L-1;break}}
+ for(const k in E.furn)E.furn[k]=cl(Math.floor(E.furn[k])||0,0,fmax(k,E.lvl));
+ for(const t of["camel","sheep"]){E.pens[t]=E.pens[t]?1:0;E.an[t]=cl(Math.floor(E.an[t])||0,0,E.pens[t]?acap(t,E.lvl):0);E.hun[t]=cl(E.hun[t],0,100);E.prod[t]=Math.max(0,E.prod[t])}}
+function ecoInit(){if(!S.eco||typeof S.eco!="object")S.eco=newEco();const E=S.eco,d=newEco();
+ for(const k in d)if(E[k]==null||typeof E[k]!=typeof d[k])E[k]=d[k];
+ for(const k of["furn","pens","an","hun","prod"])for(const q in d[k])if(typeof E[k][q]!="number"||isNaN(E[k][q]))E[k][q]=d[k][q];
+ ecoSanitize();if(!ecoWorld){ecoWorld=1;buildWorldEco()}
+ cancelJob();if(bld)finishBuild(1);pin=null;buildHome(false);save()}
+function ecoReset(){S.eco=null;ecoInit()}
+/* ---------- tabrakan & bentuk ---------- */
+function addC(x,z,r,tag){col.push({x,z,r,h:tag})}
+function lineC(x1,z1,x2,z2,r,tag){const L=Math.hypot(x2-x1,z2-z1),n=Math.max(1,Math.ceil(L/1));for(let i=0;i<=n;i++)addC(x1+(x2-x1)*i/n,z1+(z2-z1)*i/n,r,tag)}
+function rectC(cx,cz,w,d,tag){lineC(cx-w/2,cz-d/2,cx+w/2,cz-d/2,.55,tag);lineC(cx-w/2,cz+d/2,cx+w/2,cz+d/2,.55,tag);lineC(cx-w/2,cz-d/2,cx-w/2,cz+d/2,.55,tag);lineC(cx+w/2,cz-d/2,cx+w/2,cz+d/2,.55,tag)}
+function miniPalm(x,z,g){const PG=palmGeos();mk(PG.t,MC,x,0,z,g).scale.setScalar(.6);mk(PG.l,MC,x,0,z,g).scale.setScalar(.6)}
+function houseModel(pi,lv){
+ const H=HOMES[pi],w=7+lv*.9,d=6+lv*.7,h=3.2+lv*.3,px=PLOTS[pi][0],pz=PLOTS[pi][1],tag=pi+1,g=new T.Group(),rf=new T.Group();
+ g.position.set(px,0,pz);g.rotation.y=PI;g.add(rf);
+ const wc=lv<4?H.c:lv<8?0xf1e2bd:0xfff3d6,tc=lv>=8?0xd4a017:0xc9a36b,dw=3.6,sw=(w-dw)/2,t=.5,gl=0x4fc3f7,W2=(lx,lz)=>[px-lx,pz-lz];
+ bx(w,.12,d,lv<5?0xb58b55:0xd8c08a,0,.06,0,g);
+ bx(w,h,t,wc,0,h/2,-d/2+t/2,g);bx(t,h,d,wc,-w/2+t/2,h/2,0,g);bx(t,h,d,wc,w/2-t/2,h/2,0,g);
+ [-1,1].forEach(s=>{bx(sw,h,t,wc,s*(dw/2+sw/2),h/2,d/2-t/2,g);bx(.35,2.7,.6,tc,s*dw/2,1.35,d/2,g);bx(1.1,1,.12,gl,s*(dw/2+sw/2),h*.62,d/2+.02,g)});
+ bx(dw,h-2.7,t,wc,0,2.7+(h-2.7)/2,d/2-t/2,g);bx(dw+.7,.3,.7,tc,0,2.85,d/2,g);
+ const nw=lv<1?1:Math.min(4,1+Math.ceil(lv/3));
+ for(let i=0;i<nw;i++){const z=nw==1?0:-d/2+2+i*((d-4)/(nw-1));[-1,1].forEach(s=>{bx(.2,1.3,1.5,tc,s*(w/2+.01),h*.62,z,g);bx(.24,1,1.2,gl,s*(w/2+.03),h*.62,z,g)})}
+ let top=h+.4;bx(w+.8,.4,d+.8,tc,0,h+.2,0,rf);if(lv>=4){bx(w+1.1,.2,d+1.1,0xd4a017,0,h+.5,0,rf);top=h+.6}
+ // colliders dinding (rumah menghadap -z dunia, pintu di sisi depan)
+ {const zf=pz-d/2+.25,a=px-dw/2-.3,b=px+dw/2+.3;lineC(px-w/2,pz+d/2-.25,px+w/2,pz+d/2-.25,.55,tag);lineC(px+w/2-.25,pz-d/2,px+w/2-.25,pz+d/2,.55,tag);lineC(px-w/2+.25,pz-d/2,px-w/2+.25,pz+d/2,.55,tag);lineC(px-w/2,zf,px-dw/2,zf,.55,tag);lineC(px+dw/2,zf,px+w/2,zf,.55,tag)}
+ if(lv>=2){const zf=d/2+(lv>=10?8:3.8),s2=(w/2+1)-dw/2;[-1,1].forEach(s=>bx(s2,.9,.3,tc,s*(dw/2+s2/2),.45,zf,g))}
+ if(lv>=3)[-1,1].forEach(s=>{const x=s*(w/2+2.2),z=d/2+2.2;miniPalm(x,z,g);const c=W2(x,z);addC(c[0],c[1],.5,tag)});
+ if(lv>=5){[-1,1].forEach(s=>{const x=s*(dw/2+1),z=d/2+2;mk(cyg(.3,.35,3.3,8),0xf6ecd2,x,1.65,z,g);const c=W2(x,z);addC(c[0],c[1],.45,tag)});bx(dw+3.2,.35,3.4,tc,0,3.45,d/2+1.4,g)}
+ if(lv>=6){const x=w/2+2.5,z=-d*.15,ww=5,wd=d*.6;bx(ww,h*.8,wd,wc,x,h*.4,z,g);bx(ww+.6,.35,wd+.6,tc,x,h*.8+.17,z,g);bx(.12,1,1.2,gl,x+ww/2+.02,h*.45,z,g);const c=W2(x,z);rectC(c[0],c[1],ww,wd,tag)}
+ if(lv>=7){const sf=2.8;bx(w*.62,sf,d*.62,wc,0,top+sf/2,0,rf);bx(w*.62+.7,.3,d*.62+.7,tc,0,top+sf+.15,0,rf);[-1,1].forEach(s=>bx(1.1,.9,.12,gl,0,top+sf/2,s*(d*.31+.02),rf));top+=sf+.3}
+ if(lv>=8){const r=Math.min(w,d)*.2+.5;mk(new T.SphereGeometry(r,14,8,0,6.283,0,1.571),0x1e88e5,0,top,0,rf);mk(cyg(.07,.07,1.6,5),0xd4a017,0,top+r+.5,0,rf);mk(spg(.22),0xd4a017,0,top+r+1.35,0,rf)}
+ const mnr=(x,z)=>{mk(cyg(.7,.9,h*2.2,10),wc,x,h*1.1,z,g);bx(2,.3,2,tc,x,h*1.7,z,g);mk(new T.ConeGeometry(1.1,2,10),0xd4a017,x,h*2.2+1,z,g);const c=W2(x,z);addC(c[0],c[1],1,tag)};
+ if(lv>=9)mnr(-(w/2+1.3),-d/2+1.2);
+ if(lv>=10){const z=d/2+4.8;mk(cyg(1.8,1.8,.7,14),0xbdbdbd,0,.35,z,g);mk(cyg(1.5,1.5,.1,14),0x2a9fd6,0,.72,z,g);mk(cyg(.2,.3,1.8,8),0xd4a017,0,1.2,z,g);mk(spg(.3),0xd4a017,0,2.2,z,g);const c=W2(0,z);addC(c[0],c[1],2.2,tag);
+  [-1,1].forEach(s=>{const x=s*(w/2+1.6),zz=d/2+6;miniPalm(x,zz,g);const q=W2(x,zz);addC(q[0],q[1],.5,tag)})}
+ if(lv>=11){mnr(w/2+1.3,d/2-1.2);bx(2.2,.05,3.2,0x8e2430,0,.04,d/2+1.6,g);const zf=d/2+8;
+  [-1,1].forEach(s=>{const x=s*(w/2+2.4);mk(cyg(.9,1.1,5.5,10),wc,x,2.75,zf,g);mk(new T.SphereGeometry(1.2,10,6,0,6.283,0,1.571),0xd4a017,x,5.5,zf,g);const c=W2(x,zf);addC(c[0],c[1],1.2,tag)})}
+ return{g,rf,px,pz,w,d,h}}
+function furnModel(k,x,z,g,i){if(k!="carpet"&&g.tag){const D={bed:[1.5,2.2],table:[1.8,1.1],chair:[.6,.6],ward:[.9,1.3]}[k];col.push({x:g.position.x-x,z:g.position.z-z,w:D[0],d:D[1],ry:0,h:g.tag})}
+ if(k=="bed"){bx(1.5,.45,2.2,0x8d6e63,x,.28,z,g);bx(1.4,.25,2,0xf5f0e1,x,.62,z,g);bx(1,.16,.45,0xffffff,x,.82,z-.75,g);bx(1.4,.3,1.2,[0x1565c0,0x2e7d32,0x8e2430][i%3],x,.78,z+.35,g)}
+ else if(k=="table"){bx(1.8,.12,1.1,0x6d4c1f,x,.85,z,g);[[-.8,-.45],[.8,-.45],[-.8,.45],[.8,.45]].forEach(l=>bx(.1,.85,.1,0x5d4037,x+l[0],.42,z+l[1],g))}
+ else if(k=="chair"){bx(.6,.1,.6,0x8d6e3f,x,.5,z,g);[[-.25,-.25],[.25,-.25],[-.25,.25],[.25,.25]].forEach(l=>bx(.08,.5,.08,0x5d4037,x+l[0],.25,z+l[1],g));bx(.6,.7,.08,0x8d6e3f,x,.9,z-.3,g)}
+ else if(k=="carpet"){bx(3,.04,2.2,0x8e2430,x,.14,z,g);bx(2.6,.05,1.8,0xc9a227,x,.15,z,g);bx(2.2,.06,1.4,0x8e2430,x,.16,z,g)}
+ else{bx(.9,2.2,1.3,0x5d4037,x,1.1,z,g);bx(.04,2,.04,0xd4a017,x-.47,1.1,z-.05,g);bx(.04,2,.04,0xd4a017,x-.47,1.1,z+.05,g)}}
+function furnish(g,w,d,fu){
+ for(let i=0;i<fu.bed;i++)furnModel("bed",-w/2+1.5+i*2.3,-d/2+1.7,g,i);
+ for(let i=0;i<fu.ward;i++)furnModel("ward",w/2-.8,-d/2+1.5+i*1.8,g,i);
+ for(let i=0;i<fu.carpet;i++)furnModel("carpet",i?-w/2+2.6:1.2,i?d/2-2.1:.8,g,i);
+ for(let i=0;i<fu.table;i++)furnModel("table",i?-2:1.2,i?d/2-1.8:.8,g,i);
+ [[-.1,.8],[2.5,.8],[1.2,1.75],[1.2,-.15]].forEach((p,i)=>{if(i<fu.chair)furnModel("chair",p[0],p[1],g,i)})}
+function penGeom(pi,t){const px=PLOTS[pi][0],pz=PLOTS[pi][1],pw=t=="camel"?10:9,D=6,cx=px+(t=="camel"?-6:7),cz=pz+15;return{cx,cz,pw,D,x1:cx-pw/2,x2:cx+pw/2,z1:cz-D/2,z2:cz+D/2}}
+function buildPen(pi,t,own,g){const q=penGeom(pi,t),tag=pi+1;bx(q.pw,.03,q.D,own?0xd8bd7a:0xcaa56a,q.cx,.02,q.cz,g);
+ if(own){[[q.x1,q.z1,q.cx-1.5,q.z1],[q.cx+1.5,q.z1,q.x2,q.z1],[q.x1,q.z2,q.x2,q.z2],[q.x1,q.z1,q.x1,q.z2],[q.x2,q.z1,q.x2,q.z2]].forEach(s=>{const L=Math.hypot(s[2]-s[0],s[3]-s[1]),n=Math.ceil(L/1.6);
+   for(let i=0;i<=n;i++)mk(cyg(.1,.1,1.4,5),0x6d4c41,s[0]+(s[2]-s[0])*i/n,.7,s[1]+(s[3]-s[1])*i/n,g);
+   const a=bx(L,.1,.1,0x8d6e3f,(s[0]+s[2])/2,1.1,(s[1]+s[3])/2,g),b=bx(L,.1,.1,0x8d6e3f,(s[0]+s[2])/2,.6,(s[1]+s[3])/2,g);if(s[0]==s[2]){a.rotation.y=PI/2;b.rotation.y=PI/2}
+   lineC(s[0],s[1],s[2],s[3],.45,tag)})}
+ else[[q.x1,q.z1],[q.x2,q.z1],[q.x1,q.z2],[q.x2,q.z2]].forEach(c=>mk(cyg(.12,.12,1.4,5),0xb71c1c,c[0],.7,c[1],g));
+ return q}
+function buildHome(anim){
+ for(let i=col.length-1;i>=0;i--)if(col[i].h)col.splice(i,1);
+ HG.forEach(o=>scene.remove(o));HG.length=0;PA.forEach(a=>scene.remove(a.g));PA.length=0;PL.length=0;
+ const E=S.eco;let mine=null;
+ for(let i=0;i<4;i++){const own=E.home==i,lv=own?E.lvl:0,m=houseModel(i,lv);scene.add(m.g);HG.push(m.g);PL.push({rf:m.rf,px:m.px,pz:m.pz,w:m.w,d:m.d});
+  if(own){mine=m;m.g.tag=i+1;furnish(m.g,m.w,m.d,E.furn);EID.x=m.px;EID.z=m.pz-m.d/2-1.8;EID.n="Rumah Milikmu (Level "+lv+")";
+   const pg=new T.Group();scene.add(pg);HG.push(pg);
+   ["camel","sheep"].forEach(t=>{const q=buildPen(i,t,!!E.pens[t],pg);EIP[t].x=q.cx;EIP[t].z=q.cz;
+    if(E.pens[t])for(let k=0;k<E.an[t];k++){const r=Math.floor(k/3),c=k%3,cm=t=="camel",hx=q.cx+(c-1)*(cm?3.2:2.8),hz=q.cz+(cm?-1.2+r*2.4:-1.7+r*1.7),a=cm?camel(hx,hz,0):sheep(hx,hz);if(cm)col.pop();PA.push({g:a,hx,hz,R:cm?.7:.5,ph:rnd(0,6)})}})}
+  else{const b=bub(320,96,34);b.draw(E.home<0?"DIJUAL • "+HOMES[i].p+" 🪙":"Milik Warga");b.s.scale.set(5.2,1.6,1);b.s.position.set(m.px,m.h+2.6,m.pz-m.d/2-1.2);scene.add(b.s);HG.push(b.s)}}
+ if(anim&&mine)startBuild(mine)}
+function startBuild(m){if(bld)finishBuild(1);m.g.scale.y=.03;const sc=new T.Group(),px=m.px,pz=m.pz,hw=m.w/2+1.4,hd=m.d/2+1.4,H=m.h+2.5;scene.add(sc);
+ [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(c=>bx(.25,H,.25,0x8d6e3f,px+c[0]*hw,H/2,pz+c[1]*hd,sc));
+ [.35,.7].forEach(f=>[-1,1].forEach(s=>{bx(hw*2,.15,.15,0xa1887f,px,H*f,pz+s*hd,sc);bx(.15,.15,hd*2,0xa1887f,px+s*hw,H*f,pz,sc)}));
+ const ws=[-1,1].map(s=>{const w=person({r:0xff8f00,h:0xffee58,s:0xc68642,wk:1,n:"Tukang"+s,act:"hammer"});w.position.set(px+s*(hw+1.2),0,pz-hd-.8);w.rotation.y=PI;scene.add(w);return w});
+ const dust=[];for(let i=0;i<18;i++){const mm=mk(spg(.5),new T.MeshBasicMaterial({color:0xe8d4a8,transparent:true,opacity:.6}),px+rnd(-hw,hw),.3,pz+rnd(-hd,hd));dust.push({m:mm,v:rnd(.4,1.1)})}
+ bld={g:m.g,t:0,dur:4.8,sc,ws,dust,lv:S.eco.lvl}}
+function finishBuild(silent){if(!bld)return;const b=bld;bld=null;scene.remove(b.sc);b.ws.forEach(w=>scene.remove(w));b.dust.forEach(d=>scene.remove(d.m));b.g.scale.y=1;if(!silent&&S.eco.home>=0)toast("🏠 Pembangunan selesai! "+HOMES[S.eco.home].n+" — Level "+b.lv+" ("+LNAME[b.lv]+")")}
+function goHome(){const E=S.eco;if(E.home<0)return;const p=PLOTS[E.home];P.x=p[0];P.z=p[1]-16;yaw=PI;pitch=0}
+function farHome(){const E=S.eco;if(E.home<0)return false;const p=PLOTS[E.home];return Math.hypot(P.x-p[0],P.z-p[1])>35}
+function afterBuild(msg){if(farHome())sx("🔨 Pembangunan dimulai!",msg,[{t:"🚶 Lihat pembangunan",fn:()=>{goHome();hide()}},{t:"Nanti saja"}]);else{hide();toast(msg)}}
+/* ---------- dunia statis ---------- */
+function fenceRect(r,open){const g=new T.Group();scene.add(g);const x1=r[0],z1=r[1],x2=r[2],z2=r[3];
+ [["n",x1,z1,x2,z1],["s",x1,z2,x2,z2],["w",x1,z1,x1,z2],["e",x2,z1,x2,z2]].forEach(s=>{if(s[0]==open)return;const L=Math.hypot(s[3]-s[1],s[4]-s[2]),n=Math.ceil(L/2);lineC(s[1],s[2],s[3],s[4],.45);
+  for(let i=0;i<=n;i++)mk(cyg(.1,.1,1.4,5),0x6d4c41,s[1]+(s[3]-s[1])*i/n,.7,s[2]+(s[4]-s[2])*i/n,g);
+  const a=bx(L,.1,.1,0x8d6e3f,(s[1]+s[3])/2,1.1,(s[2]+s[4])/2,g),b=bx(L,.1,.1,0x8d6e3f,(s[1]+s[3])/2,.6,(s[2]+s[4])/2,g);if(s[0]=="w"||s[0]=="e"){a.rotation.y=PI/2;b.rotation.y=PI/2}});
+ bx(x2-x1-.6,.03,z2-z1-.6,0xd8bd7a,(x1+x2)/2,.03,(z1+z2)/2,g)}
+function buildWorldEco(){
+ const sgn=(txt,x,y,z,w,h,fs)=>{const b=bub(w*64,h*64,fs);b.draw(txt);b.s.scale.set(w,h,1);b.s.position.set(x,y,z);scene.add(b.s)};
+ 
+ sgn("🛒 Toko Pak Tijarah",69,5.2,102,6,1.7,40);sgn("🏠 Agen Rumah",69,5.2,78,5.5,1.6,40);
+ for(let i=0;i<4;i++){const p=PLOTS[i];EI.push({n:"Rumah: "+HOMES[i].n,x:p[0],z:p[1]-4.8,ir:4,ok:()=>S.eco.home!=i,fn:()=>S.eco.home<0?houseInfo(i):say("🏠 "+HOMES[i].n,"Rumah ini sudah dimiliki warga lain.",[{t:"OK"}])})}
+ fenceRect(JOBS.unta.rect,JOBS.unta.open);fenceRect(JOBS.domba.rect,JOBS.domba.open);
+ sgn("Kandang Unta",86,3.4,4,5,1.2,34);sgn("Kandang Domba",-34,3.4,42,5,1.2,34);
+ hayPile(34,86.8);col.push({x:34,z:87.45,w:5.4,d:2.5,ry:0});
+ [94,102,108].forEach(z=>{trough(29.5,z);col.push({x:29.5,z,w:2.5,d:1,ry:0})});
+ mk(cyg(.6,.6,1.1,8),0x8d6e3f,55,.55,-27.6);[0,1,2].forEach(i=>mk(spg(.5),0xe0d3b8,52+i*.9,.4,31.6));
+ JMK=new T.Group();JMK.visible=false;scene.add(JMK);mk(new T.OctahedronGeometry(.55),new T.MeshBasicMaterial({color:0xff9800}),0,1.3,0,JMK);mk(cyg(.15,.15,14,6),new T.MeshBasicMaterial({color:0xff9800,transparent:true,opacity:.35}),0,7,0,JMK);
+ [[-72,16],[-92,-46],[-30,-54],[22,-40],[64,-60],[128,8],[120,70],[64,20],[-100,90],[-130,30],[10,128],[40,64]].forEach((p,i)=>{const g=new T.Group();g.position.set(p[0],.9,p[1]);scene.add(g);
+  mk(cyg(.5,.5,.12,14),new T.MeshBasicMaterial({color:0xffc107}),0,0,0,g).rotation.z=PI/2;mk(cyg(.32,.32,.14,14),new T.MeshBasicMaterial({color:0xfff176}),0,0,0,g).rotation.z=PI/2;CP.push({g,x:p[0],z:p[1],i})})}
+/* ---------- NPC & interaksi ---------- */
+function ecoNear(nb,nd){let b=nb,bd=nd;if(UI)return b;EI.forEach(o=>{if(o.ok&&!o.ok())return;const d=Math.hypot(P.x-o.x,P.z-o.z);if(d<(o.ir||4)&&d<bd){bd=d;b=o}});return b}
+function ecoTalk(o){if(o.shop)return shopMenu();if(o.agen)return agenMenu();if(o.job)return jobTalk(o)}
+/* ---------- pekerjaan ---------- */
+function jobTxt(){if(!JB)return"";const c=JB.c;if(JB.k=="herd")return c.ic+" "+c.n+": "+JB.an.filter(a=>a.in).length+"/"+JB.an.length+" "+TN[c.type].toLowerCase()+" masuk kandang";
+ const p=c.pts[Math.min(JB.step,c.pts.length-1)];return c.ic+" "+c.n+": tahap "+(JB.step+1)+"/"+c.pts.length+" • "+p.l+(JB.carry?" • 📦 "+JB.carry:"")}
+function jobTarget(){if(JB){if(JB.k=="wp"){const p=JB.c.pts[JB.step];return{p:p.p,n:p.l}}const r=JB.c.rect;return{p:[(r[0]+r[2])/2,(r[1]+r[3])/2],n:"Kandang "+TN[JB.c.type]}}return pin}
+function cancelJob(){if(!JB)return;if(JB.an)JB.an.forEach(a=>scene.remove(a.g));JB=null}
+function startJob(id){if(JB)return;const c=JOBS[id];JB={id,c,k:c.k};
+ if(c.k=="herd"){JB.an=[];const o=c.spawn;for(let i=0;i<c.cnt;i++){const a=rnd(0,6.28),r=rnd(1,o[2]),x=o[0]+Math.cos(a)*r,z=o[1]+Math.sin(a)*r;let g;if(c.type=="camel"){g=camel(x,z,rnd(0,6));col.pop()}else g=sheep(x,z);JB.an.push({g,wt:0,wa:rnd(0,6),in:0,ph:rnd(0,6)})}}
+ else{JB.step=0;JB.carry=null}}
+function herdTick(dt){const J=JB,c=J.c,r=c.rect,ar=c.arena,sp=c.type=="camel"?4.2:5.4;let all=true;
+ J.an.forEach(a=>{const p=a.g.position;let vx=0,vz=0;const dx=p.x-P.x,dz=p.z-P.z,d=Math.hypot(dx,dz);
+  if(!a.in&&p.x>r[0]+.8&&p.x<r[2]-.8&&p.z>r[1]+.8&&p.z<r[3]-.8)a.in=1;
+  a.wt-=dt;if(a.wt<=0){a.wt=rnd(1.5,3.5);a.wa=rnd(0,6.28)}
+  if(a.in){vx=Math.cos(a.wa)*.5;vz=Math.sin(a.wa)*.5;p.x=cl(p.x+vx*dt,r[0]+1,r[2]-1);p.z=cl(p.z+vz*dt,r[1]+1,r[3]-1)}
+  else{all=false;if(d<7.5&&d>.01){const f=(1-d/7.5+.25)*sp;vx=dx/d*f;vz=dz/d*f}else{vx=Math.cos(a.wa)*.7;vz=Math.sin(a.wa)*.7}
+   const nx=p.x+vx*dt,nz=p.z+vz*dt;if(nx<ar[0]||nx>ar[2]){vz+=(vz>=0?1:-1)*Math.abs(vx)*.9;vx=0}if(nz<ar[1]||nz>ar[3]){vx+=(vx>=0?1:-1)*Math.abs(vz)*.9;vz=0}
+   p.x=cl(p.x+vx*dt,ar[0],ar[2]);p.z=cl(p.z+vz*dt,ar[1],ar[3])}
+  const mv=Math.hypot(vx,vz);if(mv>.15)a.g.rotation.y=Math.atan2(-vz,vx);p.y=mv>.3?Math.abs(Math.sin(tt*7+a.ph))*.08:0});
+ if(all){J.fin=(J.fin||0)+dt;if(J.fin>1.2)finishJob()}}
+function wpTick(){const p=JB.c.pts[JB.step];if(Math.hypot(P.x-p.p[0],P.z-p.p[1])<2.8){if(p.c){JB.carry=p.c;toast("📦 Mengambil: "+p.c)}else{toast("✅ "+p.l);JB.carry=null}JB.step++;if(JB.step>=JB.c.pts.length)finishJob()}}
+function finishJob(){const J=JB,c=J.c,E=S.eco;cancelJob();const first=!(E.jobs[J.id]>0),rw=Math.round(c.rw*(1+.04*E.lvl))+(first?20:0);
+ E.jobs[J.id]=(E.jobs[J.id]||0)+1;E.total++;E.cd[J.id]=Date.now()+30000;addCoins(rw);
+ say("💼 Pekerjaan Selesai!",c.n+" tuntas!\n\n🪙 Imbalan: +"+rw+" koin"+(first?" (termasuk bonus pertama kali +20)":"")+(E.lvl?"\n🏠 Bonus rumah Level "+E.lvl+": +"+E.lvl*4+"%":"")+"\n💰 Total koin: "+fl(E.coins)+"\n💼 Total pekerjaan: "+E.total+"\n\n🌟 "+c.pai,[{t:"Lanjut ▶"}])}
+function jobTalk(o){const c=JOBS[o.job],E=S.eco,id=o.job,cdl=Math.ceil(((E.cd[id]||0)-Date.now())/1000),rw=Math.round(c.rw*(1+.04*E.lvl)),hd="Assalamu'alaikum, "+S.name+"! ";
+ if(JB&&JB.id==id)return sx(o.n,"Pekerjaanmu sedang berjalan.\n"+jobTxt(),[{t:"Lanjutkan"},{t:"✖ Batalkan pekerjaan",fn:()=>{cancelJob();hide()}}]);
+ if(JB)return sx(o.n,hd+"Kamu masih mengerjakan \""+JB.c.n+"\". Selesaikan atau batalkan dulu ya.",[{t:"Baik"},{t:"✖ Batalkan pekerjaan sebelumnya",fn:()=>{cancelJob();jobTalk(o)}}]);
+ if(cdl>0)return sx(o.n,hd+"Terima kasih atas bantuanmu tadi! Istirahat dulu. Datang lagi "+cdl+" detik lagi.\n\n(Sudah dikerjakan "+(E.jobs[id]||0)+" kali.)",[{t:"Baik"}]);
+ sx(o.n,hd+c.say+"\n\n🪙 Imbalan: "+rw+" koin"+((E.jobs[id]||0)?"":" (+20 bonus pertama kali)"),[{t:"▶ Terima pekerjaan",fn:()=>{startJob(id);hide();toast("▶ "+c.n+" dimulai!")}},{t:"Nanti saja"}])}
+/* ---------- menu ekonomi ---------- */
+function ecoMenu(){const E=S.eco,h=E.home>=0;
+ sx("🏠 Rumah & Pekerjaan","💰 Koin: "+fl(E.coins)+"  •  💼 Pekerjaan selesai: "+E.total+"\n"+(h?"🏠 "+HOMES[E.home].n+" — Level "+E.lvl+"/11 ("+LNAME[E.lvl]+")":"🏠 Belum punya rumah. Temui Pak Makelar Idris di Perumahan Al-Barakah (tenggara).")+(JB?"\n▶ Sedang bekerja: "+JB.c.n:"")+"\n\n🪙 Koin Emas tersembunyi di seluruh dunia. Jelajahi untuk menemukannya!",
+ [{t:"💼 Daftar Pekerjaan",fn:jobList},{t:"🏠 Rumahku",fn:homeMenu},{t:"📜 Level & Persyaratan",fn:levelList},{t:"📍 Tandai Tujuan di Kompas",fn:pinMenu}].concat(JB?[{t:"✖ Batalkan pekerjaan",fn:()=>{cancelJob();hide();toast("Pekerjaan dibatalkan")}}]:[]).concat([{t:"Tutup"}]))}
+function jobList(){const E=S.eco;sx("💼 Pekerjaan Sampingan",Object.keys(JOBS).map(id=>{const c=JOBS[id],cd=Math.ceil(((E.cd[id]||0)-Date.now())/1000);return c.ic+" "+c.n+"\n   Pemberi kerja: "+c.giver+" ("+c.loc+")\n   Imbalan: "+Math.round(c.rw*(1+.04*E.lvl))+" 🪙 • Selesai: "+(E.jobs[id]||0)+"x"+(cd>0?" • ⏳ "+cd+" dtk":" • ✅ siap")}).join("\n\n")+"\n\n💡 Naikkan level rumah untuk bonus imbalan +4% per level.",[{t:"◀ Kembali",fn:ecoMenu},{t:"Tutup"}])}
+function pinMenu(){const l=N.filter(o=>o.eco);sx("📍 Tandai Tujuan","Pilih tujuan untuk ditunjukkan kompas 🧭:",l.map(o=>({t:o.n,fn:()=>{pin={p:[o.x,o.z],n:o.n};hide();toast("📍 Kompas menunjuk ke "+o.n)}})).concat([{t:"❌ Hapus tanda",fn:()=>{pin=null;hide()}},{t:"◀ Kembali",fn:ecoMenu}]))}
+function levelList(){const E=S.eco;let t="Level 0 — "+LNAME[0]+": rumah dasar saat dibeli.\n";
+ for(let L=1;L<=11;L++){const done_=E.home>=0&&E.lvl>=L,nx=E.home>=0&&E.lvl==L-1;t+="\n"+(done_?"✅":nx?"▶️":"🔒")+" Level "+L+" — "+LNAME[L]+" • "+UP[L].p+" 🪙\n   "+LDESC[L]+"\n";if(!done_)reqs(L).forEach(r=>{t+="   "+(r.ok?"✅ ":"⬜ ")+r.t+"\n"})}
+ sx("📜 Level & Persyaratan Rumah",t+"\nUpgrade harus berurutan: Level 1 → 11. Semua syarat harus terpenuhi.",[{t:"◀ Kembali",fn:ecoMenu},{t:"Tutup"}])}
+/* ---------- rumah ---------- */
+function agenMenu(){const E=S.eco;
+ if(E.home>=0)return sx("🏠 Pak Makelar Idris","Selamat, "+S.name+"! Kamu sudah memiliki "+HOMES[E.home].n+" (Level "+E.lvl+"). Tingkatkan rumahmu lewat pintu rumah atau menu 🏠.",[{t:"🏠 Kelola Rumahku",fn:homeMenu},{t:"Tutup"}]);
+ sx("🏠 Pak Makelar Idris","Assalamu'alaikum, "+S.name+"! Pilih satu rumah untuk kamu miliki. Rumah bisa ditingkatkan hingga Level 11.\n💰 Koinmu: "+fl(E.coins),HOMES.map((h,i)=>({t:h.n+" — "+h.p+" 🪙",dis:E.coins<h.p,fn:()=>houseInfo(i)})).concat([{t:"Tutup"}]))}
+function houseInfo(i){const E=S.eco,h=HOMES[i];if(E.home>=0)return agenMenu();
+ sx("🏠 "+h.n,h.d+"\n\nHarga: "+h.p+" 🪙\n💰 Koinmu: "+fl(E.coins)+"\n\nSetelah dibeli, rumah ini bisa dibeli perabotan, kandang, ternak, dan ditingkatkan sampai Level 11.",[{t:"🏠 Beli ("+h.p+" 🪙)",dis:E.coins<h.p,fn:()=>buyHouse(i)},{t:"◀ Kembali",fn:agenMenu},{t:"Tutup"}])}
+function buyHouse(i){const E=S.eco,h=HOMES[i];if(E.home>=0)return agenMenu();if(E.coins<h.p)return sx("Koin kurang","Kamu butuh "+h.p+" 🪙 tetapi baru punya "+fl(E.coins)+" 🪙. Kerjakan pekerjaan sampingan dulu ya!",[{t:"Baik"}]);
+ spend(h.p);E.home=i;E.lvl=0;save();buildHome(true);hud();afterBuild("🎉 Selamat! "+h.n+" sedang dibangun di Perumahan Al-Barakah.")}
+function homeMenu(){const E=S.eco;if(E.home<0)return sx("🏠 Rumahku","Kamu belum punya rumah. Temui Pak Makelar Idris di Perumahan Al-Barakah (tenggara).",[{t:"📍 Tandai di kompas",fn:()=>{pin={p:[69,80],n:"Pak Makelar Idris"};hide()}},{t:"Tutup"}]);
+ const L=E.lvl,nx=L<11?UP[L+1]:null;let t=HOMES[E.home].n+" — Level "+L+"/11\n"+LNAME[L]+": "+LDESC[L]+"\n\n"+
+ Object.keys(FURN).map(k=>FURN[k].ic+" "+FURN[k].n+": "+E.furn[k]+"/"+fmax(k,L)).join("  ")+"\n🏗️ Kandang: Unta "+(E.pens.camel?"✓":"–")+"  Domba "+(E.pens.sheep?"✓":"–")+"\n🐪 Unta "+E.an.camel+"/"+(E.pens.camel?acap("camel",L):0)+"   🐑 Domba "+E.an.sheep+"/"+(E.pens.sheep?acap("sheep",L):0)+"\n💼 Bonus imbalan pekerjaan: +"+L*4+"%\n💰 Koin: "+fl(E.coins);
+ const bs=[];
+ if(nx){const r=reqs(L+1),ok=r.every(x=>x.ok);t+="\n\n⬆️ Syarat Level "+(L+1)+" ("+LNAME[L+1]+"):\n"+r.map(x=>(x.ok?"✅ ":"⬜ ")+x.t).join("\n")+"\n   "+LDESC[L+1];bs.push({t:"🔨 Upgrade ke Level "+(L+1)+" ("+nx.p+" 🪙)",dis:!ok,fn:upgrade})}
+ else t+="\n\n🏆 Rumahmu sudah Level 11, istana terbesar di padang pasir!";
+ bs.push({t:"🛒 Beli perabot/ternak: temui Pak Tijarah",fn:()=>{pin={p:[69,102],n:"Pak Tijarah (Toko)"};hide();toast("📍 Kompas menunjuk ke toko")}},{t:"🚶 Menuju rumahku",fn:()=>{goHome();hide()}},{t:"📜 Semua Level",fn:levelList},{t:"Tutup"});
+ sx("🏠 Rumahku",t,bs)}
+function upgrade(){const E=S.eco,L=E.lvl;if(E.home<0||L>=11)return homeMenu();if(bld)return sx("🔨 Sedang membangun","Tunggu pembangunan sebelumnya selesai.",[{t:"Baik"}]);
+ const r=reqs(L+1);if(!r.every(x=>x.ok))return sx("🔒 Syarat belum terpenuhi","Level "+(L+1)+" belum bisa dibangun:\n"+r.map(x=>(x.ok?"✅ ":"⬜ ")+x.t).join("\n"),[{t:"◀ Kembali",fn:homeMenu}]);
+ if(!spend(UP[L+1].p))return;E.lvl=L+1;save();buildHome(true);hud();afterBuild("🔨 Membangun Level "+E.lvl+": "+LNAME[E.lvl]+". Lihat rumahmu tumbuh!")}
+/* ---------- toko ---------- */
+function shopMenu(){const E=S.eco;
+ if(E.home<0)return sx("🛒 Toko Pak Tijarah","Assalamu'alaikum, "+S.name+"! Tokoku menjual perabot, kandang, dan hewan ternak untuk rumah. Beli rumah dulu di Pak Makelar Idris ya.\n\n💰 Koin: "+fl(E.coins),[{t:"Tutup"}]);
+ sx("🛒 Toko Pak Tijarah","Selamat datang! Apa yang ingin kamu beli?\n💰 Koin: "+fl(E.coins),[{t:"🪑 Perabotan",fn:()=>shopFurn()},{t:"🏗️ Kandang",fn:()=>shopPen()},{t:"🐪 Hewan Ternak",fn:()=>shopAn()},{t:"Tutup"}])}
+function shopFurn(msg){const E=S.eco;sx("🪑 Perabotan",(msg?msg+"\n\n":"")+"💰 Koin: "+fl(E.coins)+"\nJumlah perabot yang muat bergantung pada level rumah.",Object.keys(FURN).map(k=>{const f=FURN[k],mx=fmax(k,E.lvl);return{t:f.ic+" "+f.n+" — "+f.p+" 🪙\nPunya "+E.furn[k]+"/"+mx,dis:E.furn[k]>=mx||E.coins<f.p,fn:()=>buyF(k)}}).concat([{t:"◀ Kembali",fn:shopMenu},{t:"Tutup"}]))}
+function buyF(k){const E=S.eco,f=FURN[k];if(E.furn[k]>=fmax(k,E.lvl))return shopFurn("🏠 Rumahmu belum cukup luas untuk menambah "+f.n+". Tingkatkan level rumah!");if(!spend(f.p))return shopFurn("Koin tidak cukup untuk "+f.n+".");E.furn[k]++;save();buildHome(false);shopFurn("✅ Membeli "+f.n+"!")}
+function shopPen(msg){const E=S.eco;sx("🏗️ Kandang",(msg?msg+"\n\n":"")+"💰 Koin: "+fl(E.coins)+"\nKandang dibangun di belakang rumahmu.",["camel","sheep"].map(t=>({t:"🏗️ Kandang "+TN[t]+" — "+PRC.pen[t]+" 🪙"+(E.pens[t]?"\n✓ Sudah dimiliki":""),dis:!!E.pens[t]||E.coins<PRC.pen[t],fn:()=>buyPen(t)})).concat([{t:"◀ Kembali",fn:shopMenu},{t:"Tutup"}]))}
+function buyPen(t){const E=S.eco;if(E.pens[t])return shopPen("Kandang sudah dimiliki.");if(!spend(PRC.pen[t]))return shopPen("Koin tidak cukup.");E.pens[t]=1;save();buildHome(false);shopPen("✅ Kandang "+TN[t]+" dibangun di belakang rumahmu!")}
+function shopAn(msg){const E=S.eco;sx("🐪 Hewan Ternak",(msg?msg+"\n\n":"")+"💰 Koin: "+fl(E.coins)+"\nTernak yang kenyang menghasilkan koin. Beri pakan di kandang secara rutin!",["camel","sheep"].map(t=>{const cap=E.pens[t]?acap(t,E.lvl):0;return{t:IC[t]+" "+TN[t]+" — "+PRC.an[t]+" 🪙\nPunya "+E.an[t]+"/"+cap+(E.pens[t]?"":" (butuh kandang)"),dis:!E.pens[t]||E.an[t]>=cap||E.coins<PRC.an[t],fn:()=>buyAn(t)}}).concat([{t:"◀ Kembali",fn:shopMenu},{t:"Tutup"}]))}
+function buyAn(t){const E=S.eco;if(!E.pens[t])return shopAn("Beli kandang "+TN[t].toLowerCase()+" dulu.");if(E.an[t]>=acap(t,E.lvl))return shopAn("Kandang penuh. Tingkatkan level rumah untuk menambah kapasitas.");if(!spend(PRC.an[t]))return shopAn("Koin tidak cukup.");E.an[t]++;save();buildHome(false);shopAn("✅ Membeli 1 "+TN[t]+"!")}
+function penMenu(t,msg){const E=S.eco;if(!E.pens[t])return sx("🏗️ Lahan Kandang "+TN[t],"Lahan kosong untuk kandang "+TN[t].toLowerCase()+". Beli kandang di Toko Pak Tijarah ("+PRC.pen[t]+" 🪙).",[{t:"Tutup"}]);
+ const n=E.an[t],cap=acap(t,E.lvl),cost=n*2,ready=fl(E.prod[t]);
+ sx(IC[t]+" Kandang "+TN[t],(msg?msg+"\n\n":"")+"Penghuni: "+n+"/"+cap+"\nKenyang: "+bar(E.hun[t])+" "+fl(E.hun[t])+"%"+(n&&E.hun[t]<=0?" 😟 lapar!":"")+"\nHasil ternak siap diambil: "+ready+" 🪙\nPenghasilan: "+(PR[t]*(1+.03*E.lvl)).toFixed(1)+" 🪙/menit per ekor jika kenyang.\n\nRawat ternakmu: beri pakan secara rutin agar terus menghasilkan.",
+ [{t:"🌾 Beri Pakan ("+cost+" 🪙)",dis:!n||E.hun[t]>=95||E.coins<cost,fn:()=>{if(!n)return penMenu(t,"Belum ada hewan di kandang ini.");if(E.hun[t]>=95)return penMenu(t,"Ternak masih kenyang.");if(!spend(cost))return penMenu(t,"Koin tidak cukup untuk pakan.");E.hun[t]=100;save();penMenu(t,"🌾 Ternak sudah kenyang!")}},
+  {t:"📦 Ambil Hasil (+"+ready+" 🪙)",dis:ready<1,fn:()=>{const r=fl(E.prod[t]);if(r<1)return penMenu(t,"Belum ada hasil yang bisa diambil.");E.prod[t]-=r;addCoins(r);penMenu(t,"📦 +"+r+" 🪙 diambil!")}},{t:"Tutup"}])}
+/* ---------- tick ---------- */
+function ecoTick(dt){const E=S.eco;if(!E||!started)return;
+ for(const t of["camel","sheep"]){const n=E.an[t];if(n>0&&E.hun[t]>0){const r=PR[t]*n*(1+.03*E.lvl);E.hun[t]=Math.max(0,E.hun[t]-dt*100/240);E.prod[t]=Math.min(r*10,E.prod[t]+r*dt/60)}}
+ PA.forEach(a=>{const x=tt*.5+a.ph,z=tt*.4+a.ph*1.7;a.g.position.set(a.hx+Math.sin(x)*a.R,0,a.hz+Math.cos(z)*a.R*.7);a.g.rotation.y=Math.atan2(Math.sin(z)*.4*a.R*.7,Math.cos(x)*.5*a.R)});
+ PL.forEach(p=>{p.rf.visible=!(Math.abs(P.x-p.px)<p.w/2-.4&&Math.abs(P.z-p.pz)<p.d/2-.4)});
+ if(bld){bld.t+=dt;const u=Math.min(1,bld.t/bld.dur),e=1-Math.pow(1-u,3);bld.g.scale.y=Math.max(.03,e);bld.ws.forEach((w,i)=>{w.aR.rotation.x=-1.3+Math.sin(tt*11+i*2)*.8;w.aL.rotation.x=-.5});bld.dust.forEach(d=>{d.m.position.y+=dt*d.v;d.m.scale.setScalar(1+u*1.5);d.m.material.opacity=.55*(1-u)});if(u>=1)finishBuild()}
+ const now=Date.now();CP.forEach(c=>{const av=(E.cc[c.i]||0)<=now;c.g.visible=av;if(!av)return;c.g.rotation.y+=dt*2.5;c.g.position.y=.9+Math.sin(tt*3+c.i)*.15;if(!UI&&Math.hypot(P.x-c.x,P.z-c.z)<2.2){E.cc[c.i]=now+600000;addCoins(5);toast("🪙 Koin Emas +5! (muncul lagi 10 menit)")}});
+ if(JB&&!UI){if(JB.k=="herd")herdTick(dt);else if(JB)wpTick()}
+ if(JMK){JMK.visible=!!(JB&&JB.k=="wp");if(JMK.visible){const p=JB.c.pts[JB.step];JMK.position.set(p.p[0],0,p.p[1]);JMK.children[0].rotation.y+=dt*2}}
+ ecoHT+=dt;if(ecoHT>.2){ecoHT=0;const e=$("jbp");let t="";if(bld)t="🔨 Membangun Level "+bld.lv+"… "+Math.round(bld.t/bld.dur*100)+"%";else if(JB)t=jobTxt();if(t){e.style.display="block";if(e.textContent!=t)e.textContent=t}else e.style.display="none"}}
+$("bHome").onclick=()=>{if(!UI)ecoMenu()};
+
+/* ===== LOOP ===== */
+function resize(){R.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix()}addEventListener("resize",resize);resize();
+
+/* ===== PERILAKU NPC: bekerja, berjalan, berhenti sejenak, kembali ===== */
+const NSP=1.35;
+function blk(x,z,m){for(const c of col){if(c.npc)continue;if(c.w){const dx=x-c.x,dz=z-c.z,sn=Math.sin(c.ry||0),k=Math.cos(c.ry||0),lx=dx*k-dz*sn,lz=dx*sn+dz*k;if(Math.hypot(Math.max(Math.abs(lx)-c.w/2,0),Math.max(Math.abs(lz)-c.d/2,0))<m)return true}else if(Math.hypot(x-c.x,z-c.z)<c.r+m)return true}return false}
+function pfree(x1,z1,x2,z2){const L=Math.hypot(x2-x1,z2-z1),n=Math.max(1,Math.ceil(L/.7));for(let i=1;i<=n;i++){const px=x1+(x2-x1)*i/n,pz=z1+(z2-z1)*i/n;if(Math.hypot(px-x1,pz-z1)<1.2)continue;if(blk(px,pz,.45))return false}return true}
+const NPR=o=>o.sit?3.5:o.act=="catch"?3:(o.act=="hammer"||o.act=="spin"||o.act=="harvest")?4:(o.k&&o.k<.9)?8:/Pedagang|Penjual|Penjaga|Juragan|Peternak|Makelar|Tijarah|Bu Salma|Pak Zaid|Pak Wahab/.test(o.n)?4:o.m>=0?5:7;
+function setSit(o,b){const g=o.g;g.rig.position.y=b?-.6:0;g.lL.rotation.x=g.lR.rotation.x=b?-1.45:0}
+function npcPick(o){const g=o.g;for(let i=0;i<10;i++){const a=rnd(0,6.2832),r=rnd(2,o.R),x=o.x0+Math.cos(a)*r,z=o.z0+Math.sin(a)*r;if(Math.abs(x)<BX-3&&Math.abs(z)<BX-3&&!blk(x,z,.9)&&pfree(g.position.x,g.position.z,x,z)){o.tx=x;o.tz=z;return true}}return false}
+function npcGo(o,x,z,back){o.tx=x;o.tz=z;o.back=back;o.st="walk"}
+function npcBehave(o,dt,d,dx,dz){
+ const g=o.g;
+ if(o.st==null){o.st=o.sit?"sit":"work";o.tm=rnd(1,8);o.R=NPR(o)}
+ const k=Math.min(1,dt*10),hold=UI||d<5,f=(a,v)=>{a.rotation.x+=(v-a.rotation.x)*k},sn=Math.sin(tt*5+o.ph),by=o.by||0,st=o.st;
+ let aL=0,aR=0,lL=0,lR=0,tr=0,y=Math.sin(tt*2+o.ph)*.012;
+ const turn=a=>{let e=a-g.rotation.y;e=Math.atan2(Math.sin(e),Math.cos(e));g.rotation.y+=e*Math.min(1,dt*8)};
+ if(st=="walk"){
+  if(hold){if(d<9)g.rotation.y=Math.atan2(dx,dz)}
+  else{const ex=o.tx-g.position.x,ez=o.tz-g.position.z,e=Math.hypot(ex,ez);
+   if(e<.4){if(o.back){o.back=0;if(o.sit){o.st="sit";setSit(o,true);o.tm=rnd(25,45)}else{o.st="work";o.tm=rnd(7,14)}}else{o.st="idle";o.tm=rnd(2,5)}}
+   else{const sp=Math.min(NSP*dt,e);g.position.x+=ex/e*sp;g.position.z+=ez/e*sp;turn(Math.atan2(ex,ez));const w=Math.sin(tt*8+o.ph)*.6;aL=w;aR=-w;lL=-w;lR=w;tr=.04;y=Math.abs(w)*.1}}
+ }else{
+  if(!hold)o.tm-=dt;
+  if(st=="sit")g.rotation.y=o.fix;else if(o.fix!=null)turn(o.fix);else if(d<9)g.rotation.y=Math.atan2(dx,dz);
+  const talk=((tt*.22+o.ph)%1)<.4;
+  if(st=="sit"){if(((tt*.1+o.ph)%1)<.12)aR=-2.7+Math.sin(tt*9)*.35;else{aL=Math.sin(tt*1.7+o.ph)*.05;aR=-aL}}
+  else if(st=="work"&&o.act){const ac=o.act;
+   if(ac=="hammer"){aR=-1.3+sn*.8;aL=-.6;lL=-.1;lR=.16;tr=.08+Math.max(0,sn)*.12}
+   else if(ac=="harvest"){aL=-1.5+sn*.6;aR=-1.5-sn*.6;lL=sn*.18;lR=-sn*.18;tr=.38+sn*.1}
+   else if(ac=="spin"){aR=-1+sn*.35;aL=-.8-sn*.2;lL=.1;lR=-.1;tr=.06}
+   else if(ac=="catch"){aL=aR=-1.3+sn*.3;lL=sn*.3;lR=-sn*.3}
+   else if(ac=="play"){const s7=Math.sin(tt*7+o.ph);y=Math.abs(s7)*.5;aL=aR=-2.6+s7*.4;lL=s7*.8;lR=-s7*.8;g.rotation.y+=dt*1.5}}
+  else{if(o.cr||talk){aR=-1.25+Math.sin(tt*6+o.ph)*.3;aL=o.cr?-.5+Math.sin(tt*4)*.2:0;tr=.03}else{aL=Math.sin(tt*1.7+o.ph)*.05;aR=-aL}}
+  if(o.tm<=0&&!hold){
+   if(st=="idle"){if(!o.p&&Math.random()<.4&&npcPick(o))npcGo(o,o.tx,o.tz,0);else npcGo(o,o.x0,o.z0,1)}
+   else{if(st=="sit")setSit(o,false);
+    if(o.p)npcGo(o,o.p[0],o.p[1],0);
+    else if(npcPick(o))npcGo(o,o.tx,o.tz,0);
+    else{if(st=="sit")setSit(o,true);o.tm=rnd(3,6)}}
+  }
+ }
+ g.position.y=by+y;
+ f(g.aL,aL);f(g.aR,aR);f(g.tr,tr);if(o.st!="sit"){f(g.lL,lL);f(g.lR,lR)}
+}
+function boxPush(c){const dx=P.x-c.x,dz=P.z-c.z,sn=Math.sin(c.ry||0),k=Math.cos(c.ry||0),lx=dx*k-dz*sn,lz=dx*sn+dz*k,hw=c.w/2,hd=c.d/2,pm=.45,qx=cl(lx,-hw,hw),qz=cl(lz,-hd,hd),ex=lx-qx,ez=lz-qz,dd=Math.hypot(ex,ez);let nx,nz;
+ if(dd>=pm)return;
+ if(dd>1e-6){nx=qx+ex/dd*pm;nz=qz+ez/dd*pm}
+ else{const a=hw+pm-Math.abs(lx),b=hd+pm-Math.abs(lz);if(a<b){nx=(lx<0?-1:1)*(hw+pm);nz=lz}else{nz=(lz<0?-1:1)*(hd+pm);nx=lx}}
+ P.x=c.x+nx*k+nz*sn;P.z=c.z-nx*sn+nz*k}
+const clock=new T.Clock();let tt=0;
+function step(dt){tt+=dt;ecoTick(dt);
+if(!UI){const f=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0)+jv.y,s=(keys.KeyD||keys.ArrowRight?1:0)-(keys.KeyA||keys.ArrowLeft?1:0)+jv.x,l=Math.hypot(f,s);
+if(l>.08){const n=Math.min(1,l),sp=(keys.ShiftLeft||keys.ShiftRight||l>1.05?10:6.5)*n,sy=Math.sin(yaw),cy=Math.cos(yaw),dx=(-sy*f+cy*s)/l,dz=(-cy*f-sy*s)/l;P.x+=dx*sp*dt;P.z+=dz*sp*dt;P.fa=Math.atan2(dx,dz);P.mv=1}else P.mv=0;
+P.vy-=18*dt;P.y=Math.max(0,P.y+P.vy*dt);if(P.y==0)P.vy=0;
+for(const c of col){if(c.npc&&c.npc.g){c.x=c.npc.g.position.x;c.z=c.npc.g.position.z}if(c.w){boxPush(c);continue}const dx=P.x-c.x,dz=P.z-c.z,d=Math.hypot(dx,dz),m=c.r+.45;if(d<m&&d>1e-4){P.x=c.x+dx/d*m;P.z=c.z+dz/d*m}}
+P.x=cl(P.x,-BX,BX);P.z=cl(P.z,-BX,BX)}
+// NPC animasi & patroli
+TK.forEach(f=>f(dt,tt));animTick(dt);let nb=null,nd=1e9;
+N.forEach(o=>{const g=o.g,dx=P.x-g.position.x,dz=P.z-g.position.z,d=Math.hypot(dx,dz);g.visible=d<120;if(!g.visible)return;
+npcBehave(o,dt,d,dx,dz);
+{let rel=Math.atan2(dx,dz)-g.rotation.y;rel=Math.atan2(Math.sin(rel),Math.cos(rel));const tg=d<9&&Math.abs(rel)<2?cl(rel,-.9,.9):0;g.hd.rotation.y+=(tg-g.hd.rotation.y)*Math.min(1,dt*6);g.hd.rotation.x=d<9?.05:0}
+if(o.mk){const s=o.m>=0?S.ms[o.m]:0;o.mk.rotation.y+=dt*2;o.mk.position.y=3.1+Math.sin(tt*3+o.ph)*.12;o.mk.material.color.setHex(o.eco?0xff7043:o.cr?0xab47bc:s==3?0x43a047:s>0?0x29b6f6:0xffc107)}
+if(d<4&&d<nd){nd=d;nb=o}});
+near=ecoNear(nb,nd);{const du=Math.hypot(P.x-US.g.position.x,P.z-US.g.position.z);ub.s.visible=du<26;if(du<26){const k=Math.floor(tt/6)%CER.length;if(k!=ubi){ubi=k;ub.draw(CER[k])}}if(du<14&&!told&&!UI){told=1;toast('🎙️ Ustaz Fauzan sedang berceramah. Dekati & tekan E untuk tanya jawab!')}}
+// benda
+let ni=null;IT.forEach(t=>{const vis=S.ms[t.m]==1&&!S.tk[t.m+"_"+t.k];t.g.visible=vis;if(!vis)return;t.g.children[0].rotation.y+=dt*2;t.g.children[0].position.y=1.2+Math.sin(tt*3)*.2;const d=Math.hypot(P.x-t.g.position.x,P.z-t.g.position.z);if(d<2.4&&!UI){S.tk[t.m+"_"+t.k]=1;S.it[t.m]++;SFX.item();toast("✨ Menemukan "+t.n+"! ("+S.it[t.m]+"/"+MS[t.m].items.length+")");if(S.it[t.m]>=MS[t.m].items.length){S.ms[t.m]=2;toast("✅ Semua benda ditemukan! Kembali ke "+N[MS[t.m].who].n)}save()}});
+// avatar
+av.visible=S.cam==2;av.position.set(P.x,P.y+(P.mv&&P.y==0?Math.abs(Math.sin(tt*10))*.08:0),P.z);let da=P.fa-av.rotation.y;da=Math.atan2(Math.sin(da),Math.cos(da));av.rotation.y+=da*Math.min(1,dt*12);animAv(dt);
+// kamera
+if(S.cam==1){cam.position.set(P.x,1.65+P.y,P.z);cam.rotation.set(pitch,yaw,0)}
+else{const d=4.5,cp=Math.cos(pitch);cam.position.set(P.x+Math.sin(yaw)*cp*d,Math.max(.5,1.9+P.y-Math.sin(pitch)*d),P.z+Math.cos(yaw)*cp*d);cam.lookAt(P.x,1.5+P.y,P.z)}
+// HUD
+const pr=$("pr");if(near&&!UI){pr.style.display="block";pr.textContent=(coarse?"Tekan E":"E")+" • "+(near.fn?"":"Bicara dengan ")+near.n}else pr.style.display="none";
+$("bE").style.display=coarse&&near&&!UI?"block":"none";
+let tg=null,tn="";const jt=jobTarget();if(jt){tg=jt.p;tn=jt.n}else if(!done()){const mi=S.ms.findIndex(s=>s!=3);if(S.ms[mi]==1){const t=IT.find(t=>t.m==mi&&!S.tk[t.m+"_"+t.k]);if(t){tg=[t.g.position.x,t.g.position.z];tn=t.n}}if(!tg){const o=N[MS[mi].who];tg=[o.g.position.x,o.g.position.z];tn=o.n}}
+if(tg){const dx=tg[0]-P.x,dz=tg[1]-P.z,fx=-Math.sin(yaw),fz=-Math.cos(yaw),dot=fx*dx+fz*dz,rt=Math.cos(yaw)*dx-Math.sin(yaw)*dz,a=Math.atan2(rt,dot),ix=((Math.round(a/(Math.PI/4))%8)+8)%8;$("cmp").textContent="🧭 "+tn+" • "+Math.round(Math.hypot(dx,dz))+" m "+["⬆","↗","➡","↘","⬇","↙","⬅","↖"][ix]}else $("cmp").textContent="🏜️ Semua misi selesai! Jelajahi bebas";
+}
+function loop(){requestAnimationFrame(loop);const dt=Math.min(clock.getDelta(),.05);if(started)step(dt);R.render(scene,cam)}loop();
+/* ===== MENU AWAL ===== */
+const sv=load();if(sv){$("cont").style.display="block";$("nama").value=sv.name}
+let camSel=1;const setC=n=>{camSel=n;$("c1").classList.toggle("on",n==1);$("c2").classList.toggle("on",n==2)};$("c1").onclick=()=>setC(1);$("c2").onclick=()=>setC(2);
+function begin(first){$("start").style.display="none";$("hud").style.display="block";started=true;ecoInit();P.x=S.x;P.z=S.z;yaw=0;pitch=0;hud();setInterval(()=>{S.x=P.x;S.z=P.z;save()},4000);
+if(first)say("Selamat datang, "+S.name+"! 🏜️","Kamu tiba di negeri padang pasir pada masa lalu. Warga di sini menyimpan ilmu tentang agama Islam. Temui 6 tokoh bertanda ◆ kuning, pelajari materinya, lalu selesaikan tantangannya.\n\nMulailah dari "+N[0].n+" di Gua Hira (ikuti 🧭 kompas di kiri atas). Jangan lupa mampir ke Majelis Ilmu dekat masjid untuk bertanya pada Ustaz Fauzan.",[{t:"Mulai Menjelajah ▶",fn:()=>{hide();if(coarse)toast("Geser kiri = jalan, geser kanan = lihat")}},{t:"🎮 Cara Bermain",fn:howTo}]);else{UI=false;toast("Selamat datang kembali, "+S.name+"!")}}
+$("go").onclick=()=>{const n=$("nama").value.trim();if(!n){$("err").textContent="Tulis namamu dulu ya.";return}S={name:n,ms:MS.map(_=>0),qi:MS.map(_=>0),it:MS.map(_=>0),pts:0,cam:camSel,x:0,z:12,tr:0,tk:{},qa:{},eco:null};save();begin(1)};
+$("cont").onclick=()=>{S=Object.assign(S,sv);S.cam=camSel;begin(0)};
+$("how").onclick=()=>{$("start").style.display="none";howTo();$("db").firstChild.onclick=()=>{hide();$("start").style.display="flex"}};
+</script>
+<div id="ytm" style="position:fixed;left:-400px;top:0;width:220px;height:220px;opacity:.01;pointer-events:none" aria-hidden="true"></div>
+<script>
+/* ===== MUSIK LATAR (YouTube: u30s_POEyU4) ===== */
+const MUS=(()=>{
+const VID="u30s_POEyU4",KEY="pai_musik";
+let st={on:true,vol:40};try{Object.assign(st,JSON.parse(localStorage.getItem(KEY)||"{}"))}catch(e){}
+let pl=null,ready=false,begun=false,mode="yt",au=null,tmo=0;
+const sv=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+function icon(){const b=document.getElementById("bMus");if(b){b.textContent=st.on?"🎵":"🔇";b.style.opacity=st.on?1:.7}}
+function apply(){
+ if(mode=="yt"&&ready&&pl){try{pl.setVolume(st.vol);st.on?pl.playVideo():pl.pauseVideo()}catch(e){}}
+ else if(mode=="au"&&au){au.volume=st.vol/100;if(st.on){const r=au.play();if(r&&r.catch)r.catch(()=>{})}else au.pause()}
+ icon()}
+function fallback(){
+ if(mode=="au")return;mode="au";clearTimeout(tmo);
+ try{pl&&pl.destroy()}catch(e){}pl=null;ready=false;
+ au=new Audio("musik.mp3");au.loop=true;
+ au.onerror=()=>{toast("🎵 Musik tidak bisa dimuat. Buka game lewat http://localhost atau simpan musik.mp3 di folder yang sama.")};
+ apply()}
+function loadYT(){
+ window.onYouTubeIframeAPIReady=()=>{
+  pl=new YT.Player("ytm",{width:220,height:220,videoId:VID,
+   playerVars:{autoplay:1,controls:0,disablekb:1,playsinline:1,rel:0,loop:1,playlist:VID},
+   events:{onReady:()=>{if(mode!="yt")return;ready=true;clearTimeout(tmo);apply()},
+    onError:()=>fallback(),
+    onStateChange:e=>{if(e.data===0&&st.on&&mode=="yt"){try{pl.playVideo()}catch(x){}}}}})};
+ const sc=document.createElement("script");sc.src="https://www.youtube.com/iframe_api";sc.onerror=()=>fallback();document.head.appendChild(sc);
+ tmo=setTimeout(()=>{if(!ready)fallback()},9000)}
+function start(){if(begun)return;begun=true;loadYT();icon()}
+function toggle(){st.on=!st.on;sv();if(!begun)start();apply();try{toast(st.on?"🎵 Musik nyala":"🔇 Musik mati")}catch(e){}}
+function vol(d){st.vol=Math.max(0,Math.min(100,st.vol+d));sv();apply()}
+function label(){return st.on?"Nyala ("+st.vol+"%)":"Mati"}
+function panel(){
+ say("🎵 Musik","Musik latar petualangan.\nStatus: "+label()+"\nPintasan keyboard: tombol N",[
+  {t:st.on?"🔇 Matikan musik":"🎵 Nyalakan musik",fn:()=>{toggle();panel()}},
+  {t:"🔊 Volume lebih keras (+10)",fn:()=>{vol(10);panel()}},
+  {t:"🔉 Volume lebih pelan (−10)",fn:()=>{vol(-10);panel()}},
+  {t:"◀ Kembali",fn:menu}])}
+["go","cont"].forEach(i=>document.getElementById(i).addEventListener("click",start));
+document.getElementById("bMus").onclick=()=>{if(!UI)toggle()};
+icon();
+return{start,toggle,panel,label}})();
+</script>
+
+<script>
+/* ===== EFEK SUARA (dibuat langsung dengan WebAudio, tanpa file) ===== */
+const SFX=(()=>{
+const KEY="pai_sfx";let on=true;try{on=JSON.parse(localStorage.getItem(KEY)||"true")!==false}catch(e){}
+let ac=null,mg=null;
+function ctx(){
+ if(!ac){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;try{ac=new C();mg=ac.createGain();mg.gain.value=.5;mg.connect(ac.destination)}catch(e){ac=null;return null}}
+ if(ac.state=="suspended")ac.resume().catch(()=>{});return ac}
+/* satu nada: frekuensi, waktu mulai (detik dari sekarang), durasi, gelombang, volume, frekuensi akhir */
+function n(f,t,d,ty,v,f2){const a=ctx();if(!a||!on)return;const o=a.createOscillator(),g=a.createGain(),t0=a.currentTime+t;
+ o.type=ty||"sine";o.frequency.setValueAtTime(f,t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t0+d);
+ g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(v||.3,t0+.015);g.gain.exponentialRampToValueAtTime(.0001,t0+d);
+ o.connect(g);g.connect(mg);o.start(t0);o.stop(t0+d+.05)}
+const C5=523.25,D5=587.33,E5=659.25,G5=783.99,A5=880,C6=1046.5,E6=1318.5;
+const api={
+ ok(){[C5,E5,G5,C6].forEach((f,i)=>n(f,i*.08,.28,"triangle",.3))},
+ no(){n(311,0,.22,"square",.12,233);n(233,.18,.35,"square",.12,175)},
+ item(){n(A5,0,.15,"sine",.3);n(E6,.09,.3,"sine",.28);n(C6*2,.18,.25,"sine",.12)},
+ coin(){n(988,0,.08,"square",.1);n(1319,.07,.3,"square",.1)},
+ win(){[C5,E5,G5,C6].forEach((f,i)=>n(f,i*.12,.3,"triangle",.32));n(C6,.5,.8,"triangle",.3);n(E6,.5,.8,"sine",.18);n(G5,.5,.8,"sine",.18)},
+ end(){[C5,E5,G5,C6,G5,C6,E6].forEach((f,i)=>n(f,i*.14,.4,"triangle",.32));[C5,E5,G5,C6].forEach(f=>n(f,1.05,1.4,"sine",.16))},
+ click(){n(620,0,.05,"sine",.12,420)},
+ toggle(){on=!on;try{localStorage.setItem(KEY,JSON.stringify(on))}catch(e){}if(on)api.ok();try{toast(on?"🔔 Efek suara nyala":"🔕 Efek suara mati")}catch(e){}},
+ label(){return on?"Nyala":"Mati"}};
+/* suara klik pada tombol; audio juga "dibangunkan" oleh gestur pertama */
+document.addEventListener("click",e=>{ctx();if(e.target.closest&&e.target.closest(".b,.ib"))api.click()},true);
+return api})();
+</script>
+</body></html>
